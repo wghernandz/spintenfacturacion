@@ -1,0 +1,354 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+     
+    <body>
+   
+        <ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
+            <ui:define name="content">
+                
+                <h:form id="nuevo" style=".ui-dialog{position: absolute !important;}">
+                    <p:growl id="msgs" showDetail="true"/>
+                 
+                    <p:fieldset style="margin-left: 900px">
+                        <h1 style="text-align: left;" >TOTAL $ <h:outputLabel value="#{nuevaFacturaController.factura.totalventa}"/></h1>       
+                    </p:fieldset>
+                     <p:fieldset>
+                        <h:panelGrid id="panel" columns="5" cellpadding="2">
+                            <h:outputText value="NRC"/>
+                            <p:inputText id="nrc" value="#{nuevaFacturaController.cliente.nrc}" required="true" disabled="#{nuevaFacturaController.modificarencabezado}">
+                                <p:ajax event="keyup" listener="#{nuevaFacturaController.obtenerDatosCliente()}" update="generales"/>
+                            </p:inputText>
+                            <p:commandButton type="button" icon="fa fa-search" value="BUSCAR POR NOMBRE" onclick="PF('dlg5').show();" immediate="true"/>
+                            <p:commandButton type="button" icon="fa fa-search" value="MODIFICAR" rendered="#{nuevaFacturaController.modificarencabezado==true}" >
+                                <p:ajax event="click" listener="#{nuevaFacturaController.setModificarencabezado(false)}" update="nuevo" />
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-search" value="GUARDAR CAMBIOS" id="gcambios" action="#{nuevaFacturaController.modificarEncabezadofact}" rendered="#{nuevaFacturaController.guardarcambios==true}" update="nuevo" ajax="false">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </p:fieldset>
+                        
+                    <p:fieldset legend="DATOS CLIENTE" >
+                        <h:panelGrid id="mipanel" columns="1" cellpadding="2" >
+                            <table>
+                                <tr>
+                                    <td width="100">
+                                       Nombre Cliente: 
+                                    </td>
+                                    <td width="300" style="font-size: 14px;font-weight: bold;">
+                                       #{nuevaFacturaController.cliente.persona.primernombre} 
+                                       #{nuevaFacturaController.cliente.persona.segundonombre} 
+                                       #{nuevaFacturaController.cliente.persona.primerapellido} 
+                                       #{nuevaFacturaController.cliente.persona.segundoapellido}
+                                       #{nuevaFacturaController.cliente.persona.nombresociedad}
+                                    </td>
+                                      <td width="50">
+                                        NRC:
+                                    </td>
+                                    <td width="300" style="font-size: 14px;font-weight: bold;">
+                                        #{nuevaFacturaController.cliente.nrc}
+                                    </td>
+                                    <td width="50">
+                                        NIT:
+                                    </td>
+                                    <td width="125" style="font-size: 14px;font-weight: bold;">
+                                       #{nuevaFacturaController.cliente.persona.pnit}
+                                    </td>
+                                    <td width="50">
+                                        Direccion:
+                                    </td>
+                                    <td width="300" style="font-size: 14px;font-weight: bold;">
+                                        #{nuevaFacturaController.cliente.persona.direccion}
+                                    </td>
+                                    <td width="50">
+                                        Departamento:
+                                    </td>
+                                    <td width="150" style="font-size: 14px;font-weight: bold;">
+                                       #{nuevaFacturaController.cliente.persona.municipio.departamento.nombredepto}
+                                    </td>
+                                      </tr>
+                                        <tr> 
+                                    <td width="50">
+                                        Municipio:
+                                    </td>
+                                    <td width="150" style="font-size: 14px;font-weight: bold;">
+                                        #{nuevaFacturaController.cliente.persona.municipio.nombremunicipio}
+                                    </td>
+                                
+                                    <td width="50">
+                                        Giro:
+                                    </td>
+                                    <td width="200" style="font-size: 14px;font-weight: bold;">
+                                        #{nuevaFacturaController.cliente.giro}
+                                    </td>
+                                    <td width="75">
+                                        Cond. Pago:
+                                    </td>
+                                    <td width="50" style="font-size: 14px;font-weight: bold;">
+                                        #{nuevaFacturaController.cliente.diascredito}
+                                    </td>
+                                </tr> 
+                            </table>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="DATOS GENERALES FACTURA">   
+                         <h:panelGrid id="generales" columns="8" cellpadding="5" >
+                         <h:outputText value="Fecha"/>
+                             <p:calendar id="fech" value="#{nuevaFacturaController.factura.fecha}" pattern="dd-MM-yyyy" required="true" disabled="#{nuevaFacturaController.modificarencabezado}">
+                            </p:calendar>
+                            <h:outputText value="Tipo Documento"/>
+                            <p:selectOneMenu id="tipodoc" value="#{nuevaFacturaController.tipodocumento.id}" style="width: 150px" required="true" disabled="#{nuevaFacturaController.modificarencabezado}"  >
+                                <f:selectItem itemLabel="Seleccione Tipo" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.tiposdocumento}" var="tipo" itemLabel="#{tipo.nombredoc}" itemValue="#{tipo.id}"/>
+                                <f:ajax listener="#{nuevaFacturaController.obtenerUltimocorr}" render="corr corroculto" />
+                            </p:selectOneMenu>
+                            <h:outputText value="Correlativo"/>
+                            <p:inputText id="corr" value="#{nuevaFacturaController.factura.correlativo}" readonly="true" disabled="#{nuevaFacturaController.modificarencabezado}" >
+                                <f:convertNumber pattern="0000" />
+                            </p:inputText> 
+                         <h:outputText value="Placa"/>
+                         <p:inputText id="placaf" value="#{nuevaFacturaController.factura.placa}" disabled="#{nuevaFacturaController.modificarencabezado}"/>
+                            <h:outputText value="Marca"/>
+                            <p:selectOneMenu id="marcas" value="#{nuevaFacturaController.marcavehiculo.id}" disabled="#{nuevaFacturaController.modificarencabezado}" >
+                                <f:selectItem itemLabel="Seleccione Marca" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.marcas}" var="marca" itemLabel="#{marca.nombremarca}" itemValue="#{marca.id}"/>
+                                <f:ajax listener="#{nuevaFacturaController.cambiarModelos()}" render="modelos"></f:ajax>
+                            </p:selectOneMenu>
+                            <h:outputText value="Modelo" />
+                            <p:selectOneMenu id="modelos" value="#{nuevaFacturaController.vehiculomodelo.id}" disabled="#{nuevaFacturaController.modificarencabezado}" >
+                                <f:selectItem itemLabel="Seleccione Modelo" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.vehiculosmodelo}" var="modelo" itemLabel="#{modelo.nombremodelo}" itemValue="#{modelo.id}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Num.Siniestro"/>
+                            <p:inputText id="siniestro" value="#{nuevaFacturaController.factura.numsiniestro}" disabled="#{nuevaFacturaController.modificarencabezado}"/>
+                            <h:outputText value="Num.Orden"/>
+                            <p:inputText id="numorden" value="#{nuevaFacturaController.factura.ordencompra}" disabled="#{nuevaFacturaController.modificarencabezado}"/>
+                            <h:inputHidden  id="corroculto" value="#{nuevaFacturaController.factura.correlativo}" ></h:inputHidden>
+                         </h:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset id="facturar" legend="FACTURAR" >
+                        <h:panelGrid id="fact" columns="6"  style="margin-bottom:10px" cellpadding="2" >
+                        <p:selectOneRadio id="console" value="#{nuevaFacturaController.tipoventa}" >
+                            <f:selectItem itemLabel="V Afecta" itemValue="0" />
+                            <f:selectItem itemLabel="V Exenta" itemValue="1"  />
+                            <f:selectItem itemLabel="V No Sujeta" itemValue="2"  />
+                        </p:selectOneRadio>        
+                        <h:outputText value="Cantidad"/>
+                        <p:inputNumber id="cant" value="#{nuevaFacturaController.detallefactura.cantidad}" minValue="0" decimalPlaces="2" required="true" disabled="#{nuevaFacturaController.guardarcambios}"/>
+                        <h:outputText value="Descripcion"/>
+                        <p:selectOneMenu id="detail" value="#{nuevaFacturaController.producto.id}" style="width: 400px" required="true"  rendered="#{nuevaFacturaController.guardarcambios==false}" immediate="true" >
+                            <f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{nuevaFacturaController.productos}" var="prod" itemLabel="#{prod.concepto}" itemValue="#{prod.id}" />
+                            <p:ajax event="change" update="@this" listener="#{nuevaFacturaController.recargarSelectOneMenu()}"></p:ajax>
+                        </p:selectOneMenu>
+                        <p:commandLink value="AGREGAR CONCEPTO" oncomplete="PF('dlg4').show()" immediate="true" actionListener="#{nuevaFacturaController.crearNuevo}"/>    
+                                            
+                        </h:panelGrid>
+                        <h:panelGrid id="fact1" columns="10"  style="margin-bottom:10px" cellpadding="2">
+                            <h:outputText value="Precio Unitario"/>
+                            <p:inputNumber id="punitario" value="#{nuevaFacturaController.detallefactura.preciounitario}" minValue="0" decimalPlaces="2" required="true" disabled="#{nuevaFacturaController.guardarcambios}"/>
+                            <p:selectOneMenu id="marcasdet" value="#{nuevaFacturaController.marcavehiculodet.id}" disabled="#{nuevaFacturaController.guardarcambios}"  >
+                                <f:selectItem itemLabel="Seleccione Marca" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.marcasdet}" var="marcadet" itemLabel="#{marcadet.nombremarca}" itemValue="#{marcadet.id}"/>       
+                                <f:ajax listener="#{nuevaFacturaController.cambiarModelosdet()}" render="modelosdet" ></f:ajax>
+                            </p:selectOneMenu>
+                            <h:outputText value="Modelo" />
+                            <p:selectOneMenu id="modelosdet" value="#{nuevaFacturaController.vehiculomodelodet.id}" disabled="#{nuevaFacturaController.guardarcambios}"  >
+                                <f:selectItem itemLabel="Seleccione Modelo" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.vehiculosmodelodet}" var="modelodet" itemLabel="#{modelodet.nombremodelo}" itemValue="#{modelodet.id}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Placa"/>
+                            <p:inputText id="placadet" value="#{nuevaFacturaController.detallefactura.placa}" disabled="#{nuevaFacturaController.guardarcambios}"/>
+                            <h:outputText value="Num. Equipo"/>
+                            <p:inputText id="numequip" value="#{nuevaFacturaController.detallefactura.numequipo}" disabled="#{nuevaFacturaController.guardarcambios}" size="15"/>
+                            <p:commandButton value="AGREGAR" id="guardar" icon="ui-icon-disk" action="#{nuevaFacturaController.agregarDetalle()}"   
+                                             ajax="false" update="detallef" disabled="#{nuevaFacturaController.agregar}"/>
+                            <p:commandButton type="submit" value="MODIFICAR" disabled="#{nuevaFacturaController.modificar}" 
+                                             action="#{nuevaFacturaController.modificarDetalle()}" update="nuevo" ajax="false" />
+                            <p:commandButton value="IMPRIMIR" disabled="#{nuevaFacturaController.finalizar or nuevaFacturaController.detallesfactura==null or nuevaFacturaController.imprimir==true}" actionListener="#{nuevaFacturaController.finalizarFactura}" immediate="true" update="nuevo,detallef">
+                                <p:confirm header="Confirmation" message="Esta segur@ de Imprimir?. Una vez seleccionada esta opcion ya no podra modificar la Factura." icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </p:fieldset>
+                </h:form>
+                <h:form id="detallef">
+                    <p:fieldset legend="DETALLE">
+                        <p:dataTable id="detalle" var="detallefactura" value="#{nuevaFacturaController.detallesfactura}"  style="margin-bottom:20px">
+                            <f:facet name="header">
+                                Items a Facturar
+                            </f:facet>
+                 
+                            
+                            <p:column headerText="CANT." width="50">
+                                  <h:outputText value="#{detallefactura.cantidad}"><f:convertNumber pattern="0.00" type="number"/></h:outputText>                        
+                            </p:column>
+                            <p:column headerText="DESCRIPCION" width="500">
+                                <h:outputText value="#{detallefactura.producto.concepto}"></h:outputText>
+                            </p:column>
+                            <p:column headerText="NUM.EQUIPO">
+                                <h:outputText value="#{detallefactura.numequipo}" />                           
+                            </p:column>
+                            <p:column headerText="PRECIO UNITARIO">
+                              <h:outputText value="#{detallefactura.preciounitario}"><f:convertNumber pattern="$ 0.00" type="number"/></h:outputText>
+                            </p:column>
+                            <p:column headerText="VENTA NO SUJETA">
+                                <h:outputText value="#{detallefactura.vnogravado}"><f:convertNumber pattern="$ 0.00" type="number"/></h:outputText>     
+                            </p:column>
+                            <p:column headerText="VENTAS EXENTAS">
+                                <h:outputText value="#{detallefactura.vexento}"><f:convertNumber pattern="$ 0.00" type="number"/></h:outputText>
+                            </p:column>
+                            <p:column headerText="VENTAS AFECTAS" >
+                                <h:outputText value="#{detallefactura.vneto}" ><f:convertNumber pattern="$ 0.00" type="number"/></h:outputText>                          
+                            </p:column>
+                            <p:column style="width:32px">
+                                <p:commandButton icon="ui-icon-pencil" >
+                                    <p:ajax event="click" listener="#{nuevaFacturaController.onRowEdit(Event,detallefactura)}" disabled="#{nuevaFacturaController.enmodificacion}" update="nuevo" />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column>
+                                 <p:commandButton type="button" icon="ui-icon-close">
+                                  <p:ajax event="click" listener="#{nuevaFacturaController.onRowDelete(Event,detallefactura)}" disabled="#{nuevaFacturaController.guardarcambios}" update=":detallef:detalle,:nuevo" />
+                                 </p:commandButton>
+                            </p:column>   
+                            </p:dataTable>
+                    </p:fieldset>
+                            
+                     <p:panel id="basic" style="margin-bottom:20px">
+                          <f:facet name="header">
+                                <p:row>
+                                    <p:column>
+                                    <h:outputText value="SON:"/><p:outputLabel value="#{nuevaFacturaController.factura.tventaenletras}"/>
+                                    </p:column>
+                                    
+                                </p:row>
+                                <p:row>
+                                    <h:panelGrid id="ccf" columns="2" width="250" rendered="#{nuevaFacturaController.tipodocumento.id==45 or nuevaFacturaController.tipodocumento.id==46 or nuevaFacturaController.tipodocumento.id==49 or nuevaFacturaController.tipodocumento.id==50 or nuevaFacturaController.tipodocumento.id==51 or nuevaFacturaController.tipodocumento.id==52}">
+                                        <h:outputText value="SUMAS"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentagra}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="13% IVA"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.iva}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="SUBTOTAL"/>
+                                        <h:outputText style="text-align: right"  id="subtotal" value="#{nuevaFacturaController.subtotal}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="(-) IVA RETENIDO"/>
+                                        <h:outputText style="text-align: right" id="retencion" value="#{nuevaFacturaController.factura.retencion}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTAS EXENTAS"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTA NO SUJETA"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTA TOTAL"/>
+                                        <h:outputText style="text-align: right" id="vtotal" value="#{nuevaFacturaController.factura.totalventa}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                    </h:panelGrid>
+                                    <h:panelGrid id="fcfinal" columns="2" width="250" rendered="#{nuevaFacturaController.tipodocumento.id==47 or nuevaFacturaController.tipodocumento.id==48}">
+                                        <h:outputText value="SUMAS"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.vafectafactura}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="(-) IVA RETENIDO"/>
+                                        <h:outputText style="text-align: right" id="retencionfcfinal" value="#{nuevaFacturaController.factura.retencion}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="SUBTOTAL"/>
+                                        <h:outputText style="text-align: right"  id="subtotalfac" value="#{nuevaFacturaController.subtotal}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTAS EXENTAS"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTA NO SUJETA"/>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText value="VENTA TOTAL"/>
+                                        <h:outputText style="text-align: right" id="vtotalfcfinal" value="#{nuevaFacturaController.factura.totalventa}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                    </h:panelGrid>
+                                 </p:row>
+                               </f:facet>
+               
+                     </p:panel>
+                              
+                         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                            <h:panelGrid cellpadding="5" columns="2">
+                              <p:commandLink value="Yes" styleClass="ui-confirmdialog-yes" action="#{nuevaFacturaController.imprimirFactura(actionEvent)}" style="font-size: 16px;" target="_blank" ajax="false" immediate="true" update="nuevo,detallef" >
+                              </p:commandLink>
+                              <p:commandLink value="No" type="button" styleClass="ui-confirmdialog-no" style="font-size: 16px;"/>
+                            </h:panelGrid>
+                        </p:confirmDialog>
+                </h:form>
+            
+                <p:dialog header="VEHICULO" id="vehiculo" widgetVar="dlgvehiculo" height="100" width="550" positionType="absolute" position="top" dynamic="true" >
+                    <h:form id="formveh">
+                        <h:panelGrid columns="4" cellpadding="3">
+                            <h:outputText value="Marca"/>
+                             <p:selectOneMenu id="marcasdet" value="#{nuevaFacturaController.marcavehiculodet.id}" disabled="#{nuevaFacturaController.guardarcambios}"  >
+                                <f:selectItem itemLabel="Seleccione Marca" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.marcasdet}" var="marcadet" itemLabel="#{marcadet.nombremarca}" itemValue="#{marcadet.id}"/>       
+                                <f:ajax listener="#{nuevaFacturaController.cambiarModelosdet()}" render="modelosdet" ></f:ajax>
+                              </p:selectOneMenu>
+                            <h:outputText value="Modelo" />
+                            <p:selectOneMenu id="modelosdet" value="#{nuevaFacturaController.vehiculomodelodet.id}" disabled="#{nuevaFacturaController.guardarcambios}"  >
+                                <f:selectItem itemLabel="Seleccione Modelo" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{nuevaFacturaController.vehiculosmodelodet}" var="modelodet" itemLabel="#{modelodet.nombremodelo}" itemValue="#{modelodet.id}"/>
+                            </p:selectOneMenu>
+                            
+                            <f:facet name="footer">
+                                <p:commandButton value="ACEPTAR" id="vehic" action="#{nuevaFacturaController.establecerVehiculo()}" icon="ui-icon-disk" 
+                                             oncomplete="PF('dlgvehiculo').hide()" update=":nuevo:textvehiculo">
+                            </p:commandButton>
+                            <p:spacer></p:spacer>
+                            <p:commandButton value="CANCELAR" id="cancel" onclick="dlgvehiculo.hide();" />   
+                            </f:facet>
+                        </h:panelGrid>
+                    </h:form>
+                </p:dialog>
+                
+                  
+                <p:dialog header="Agregar Nuevo Concepto" id="agregarconcep" widgetVar="dlg4" height="100" width="550" positionType="absolute" position="top" dynamic="true" >
+                    <h:form id="form2">
+                        <h:panelGrid columns="4" cellpadding="3">
+                            <h:outputText value="Nombre Servicio:"/>
+                            <h:inputText id="concepto" value="#{nuevaFacturaController.producto.concepto}" size="50"></h:inputText>
+                            <f:facet name="footer">
+                            <p:commandButton value="ACEPTAR" id="cambiar" action="#{nuevaFacturaController.guardarServicio()}" icon="ui-icon-disk" 
+                                             update=":nuevo" oncomplete="PF('dlg4').hide()" >
+                            </p:commandButton>
+                            <p:spacer></p:spacer>
+                            <p:commandButton value="CANCELAR" id="cancel" onclick="dlg4.hide();" />   
+                            </f:facet>
+                        </h:panelGrid>
+                    </h:form>
+                </p:dialog>
+                
+                <p:dialog header="Buscar por Nombre" id="buscarxnombre" widgetVar="dlg5" height="500" width="700" position="top" positionType="absolute" style="">
+                    <h:form id="form3">
+                        <p:dataTable value="#{nuevaFacturaController.clientes}" var="cliente" rows="10"
+                                     paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" filteredValue="#{nuevaFacturaController.filteredclientes}"
+                                     selectionMode="single" selection="#{nuevaFacturaController.cliente}" rowKey="#{cliente.persona.id}">
+                         <f:facet name="header">
+                                Clientes
+                         </f:facet>
+
+                               <p:column filterBy="#{cliente.persona.nombresociedad}" headerText="Sociedad" footerText="contains" filterMatchMode="contains">
+                                  <h:outputText value="#{cliente.persona.nombresociedad}" />
+                               </p:column>
+                               <p:column filterBy="#{cliente.persona.primernombre}" headerText="Nombre" footerText="contains" filterMatchMode="contains">
+                                  <h:outputText value="#{cliente.persona.primernombre}" />
+                               </p:column>
+                               <p:column headerText="NRC">
+                                  <h:outputText value="#{cliente.nrc}" />
+                               </p:column>
+                               <p:column headerText="Giro">
+                                   <h:outputText value="#{cliente.giro}" />
+                               </p:column>
+                               <p:column headerText="Tamaño Contribuyente">
+                                   <h:outputText value="#{cliente.rangocontribuy}" />
+                               </p:column>
+                            <f:facet name="footer">
+                                  <p:commandButton action="#{nuevaFacturaController.setPersona(cliente.persona.id)}" update=":nuevo" icon="ui-icon-search" value="Seleccionar"  oncomplete="PF('dlg5').hide()"  />
+                            </f:facet>
+                            
+                        </p:dataTable>
+  
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+                
+        </ui:composition>
+    </body>
+</html>

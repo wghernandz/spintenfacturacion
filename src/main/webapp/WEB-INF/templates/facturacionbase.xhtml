@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      >
+    
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <title>Facelets Template</title>
+    </h:head>
+    
+<h:body>
+    <div id="top">
+            
+<h:form>  
+    <p:growl id="messages"/>
+    <p:menubar>
+        <p:submenu label="FACTURACION" icon="ui-icon-folder-collapsed" >
+            <p:submenu label="FACTURAR" icon="">
+                 <p:menuitem value="Nuevo" url="/facturador/nuevo.xhtml" />
+                 <p:separator />
+                 <p:menuitem value="Anular" url="/facturador/anular.xhtml" />
+            </p:submenu>
+            <p:menuitem value="REPORTES FACTURACION" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
+        </p:submenu>
+        <p:submenu label="CLIENTES" icon="ui-icon-folder-collapsed" >
+            <p:menuitem value="CLIENTE" url="/facturador/cliente.xhtml" icon="ui-icon-folder-open" />
+            <p:menuitem value="REPORTES CLIENTE" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
+        </p:submenu>
+         <p:submenu label="CORRELATIVOS" icon="ui-icon-folder-collapsed" >
+            <p:menuitem value="CORRELATIVO" url="/contabilidad/correlativo.xhtml" icon="ui-icon-folder-open" />
+            <p:menuitem value="REPORTES CORRELATIVO" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
+        </p:submenu>
+         <p:submenu label="VEHICULOS" icon="ui-icon-folder-collapsed" >
+            <p:menuitem value="AGREGAR VEHICULO" url="/facturador/vehiculos.xhtml" icon="ui-icon-folder-open" />
+        </p:submenu>
+    </p:menubar>
+</h:form>
+            
+    </div>
+
+        <div id="content" class="center_content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+
+        <div id="bottom">
+            <ui:insert name="bottom">Bottom</ui:insert>
+        </div>
+
+</h:body>
+
+</html>

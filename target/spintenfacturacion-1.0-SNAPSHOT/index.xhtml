@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>  
+	<h:form id="loginForm">
+            <p:messages autoUpdate="true" showDetail="true"/>
+		<p:growl id="msg" showDetail="true" life="4000" />
+		<p:panel id="loginPnl" header="Login"
+			style="width: 350px; margin: 0 auto;">
+			<h:panelGrid id="loginPanel" columns="2" cellpadding="5">
+				<h:outputText value="Username" />
+                                <p:inputText id="username" value="#{indexController.usuario.username}"></p:inputText>
+				<p:spacer /><p:spacer />	
+				<h:outputText value="Password" />
+                                <p:password id="password" value="#{indexController.usuario.password}"
+					feedback="false"></p:password>
+				<p:message for="password"></p:message>
+			</h:panelGrid>
+			<h:panelGrid columns="1" cellpadding="10" width="100%">
+                            <p:commandButton id="loginButton" action="#{indexController.Login}"
+					value="Login" update="loginForm" ajax="true" style="float: right;">
+				</p:commandButton>
+                                
+			</h:panelGrid>
+                       <!-- <h:panelGrid columns="1" cellpadding="10" width="100%">
+                            <p:link value="Crear Cuenta" outcome="nuevoUsuario" style="float: right;"/>
+                        </h:panelGrid>-->
+		</p:panel>
+		<p:blockUI block="loginPnl" trigger="loginButton" >
+			<p:graphicImage value="resources/images/loader.gif" />
+		</p:blockUI>
+                
+	</h:form>
+    </h:body>
+</html>
+

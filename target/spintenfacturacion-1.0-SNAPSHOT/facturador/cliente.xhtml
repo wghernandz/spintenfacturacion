@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+        <ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
+            <ui:define name="content">
+                <h:form id="mttcliente">
+                    <p:fieldset legend="DATOS PERSONA">
+                        <h:panelGrid id="tipopersona">
+                            <p:selectOneRadio id="tipoemp" value="#{clienteController.tipoempresa}">
+                                <f:selectItem itemLabel="Juridica" itemValue="Juridica"/>
+                                <f:selectItem itemLabel="Natural" itemValue="Natural"/>
+                                <p:ajax event="change" listener="#{clienteController.cambiarTipopersona}" update="@form"/>
+                            </p:selectOneRadio>
+                        </h:panelGrid>
+                        <h:panelGrid columns="8" cellpadding="2">
+                            <h:outputText value="Primer Nombre:"/>
+                            <p:inputText id="pnombre" value="#{clienteController.persona.primernombre}" disabled="#{clienteController.natural}" />
+                            <h:outputText value="Segundo Nombre:"/>
+                            <p:inputText id="snombre" value="#{clienteController.persona.segundonombre}" disabled="#{clienteController.natural}"/>
+                            <h:outputText value="Primer Apellido"/>
+                            <p:inputText id="papellido" value="#{clienteController.persona.primerapellido}" disabled="#{clienteController.natural}"/>
+                            <h:outputText value="Segundo Apellido"/>
+                            <p:inputText id="sapellido" value="#{clienteController.persona.segundoapellido}" disabled="#{clienteController.natural}" />
+                            <h:outputText value="Nombre Sociedad"/>
+                            <p:inputText id="nsociedad" value="#{clienteController.persona.nombresociedad}" disabled="#{clienteController.juridica}" />
+                            <h:outputText value="Telefono 1"/>
+                            <p:inputText id="telefono" value="#{clienteController.persona.ptelefono1}"  />
+                            <h:outputText value="Telefono 2"/>
+                            <p:inputText id="telefono2" value="#{clienteController.persona.ptelefono2}" />
+                            <h:outputText value="NIT"/>
+                            <p:inputMask id="nit" mask="9999-999999-999-9" value="#{clienteController.persona.pnit}" />
+                            <h:outputText value="DUI"/>
+                            <p:inputMask id="dui" mask="99999999-9" value="#{clienteController.persona.pdui}" disabled="#{clienteController.natural}" />
+                            <h:outputText value="Direccion"/>
+                            <p:inputText id="direccion" value="#{clienteController.persona.direccion}" />
+                            <h:outputText value="Departamento"  />
+                                <p:selectOneMenu id="departamento" value="#{clienteController.departamento.id}" required="true">
+                                    <f:selectItem itemLabel="Seleccione Depto" itemValue="" noSelectionOption="true"/>
+                                    <f:selectItems value="#{clienteController.departamentos}" var="depto" itemLabel="#{depto.nombredepto}" itemValue="#{depto.id}"/>
+                                </p:selectOneMenu>
+                            <h:outputText value="Municipio" />
+                                <p:selectOneMenu id="municipio" value="#{clienteController.municipio.id}" required="true">
+                                    <f:selectItem itemLabel="Seleccione Municipio" itemValue="" noSelectionOption="true"/>
+                                    <f:selectItems value="#{clienteController.municipios}" var="muni" itemLabel="#{muni.nombremunicipio}" itemValue="#{muni.id}"/>
+                                </p:selectOneMenu>
+                            <h:outputText value="Fecha Ingreso"/>
+                            <p:calendar value="#{clienteController.persona.fechaingreso}"></p:calendar>
+                            <h:outputText value="EMAIL"/>
+                            <p:inputText id="email" value="#{clienteController.persona.email}"/>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="DATOS CONTRIBUYENTE">
+                        <h:panelGrid columns="8" cellpadding="2">
+                            <h:outputText value="Nombre Comercial"/>
+                            <p:inputText id="nombrecomercial" value="#{clienteController.cliente.nombrecomercial}"/>
+                            <h:outputText value="NRC" />
+                            <p:inputText id="nrc" value="#{clienteController.cliente.nrc}"/>
+                            <h:outputText value="Giro"/>
+                            <p:inputText id="giro" value="#{clienteController.cliente.giro}"/>
+                            <h:outputText value="Dias Credito"/>
+                            <p:inputNumber id="diascred" minValue="0" maxValue="100" value="#{clienteController.cliente.diascredito}"/>
+                            <h:inputText value="Rango Contribuyente"/>
+                            <p:selectOneRadio id="tipocontribuy" value="#{clienteController.cliente.rangocontribuy}">
+                                <f:selectItem itemLabel="Pequeño" itemValue="Pequeño"/>
+                                <f:selectItem itemLabel="Mediano" itemValue="Mediano"/>
+                                <f:selectItem itemLabel="Gran Contribuyente" itemValue="Gran Contribuyente"/>
+                            </p:selectOneRadio>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="OPCIONES">
+                        <h:panelGrid columns="4">
+                            <p:commandButton value="GUARDAR" action="#{clienteController.guardarCliente()}" ajax="false" update="@form" disabled="#{clienteController.guardar}"/>
+                            <p:commandButton value="MODIFICAR" disabled="#{clienteController.modificar}" action="#{clienteController.modificarCliente()}" ajax="false"/>
+                            <p:commandButton type="button" value="BUSCAR" onclick="PF('dlgbuscar').show();" immediate="true" disabled="#{clienteController.buscar}"/>
+                            <p:commandButton value="ELIMINAR" action="#{clienteController.eliminarCliente()}" disabled="#{clienteController.eliminar}" update="mttcliente"/>
+                        </h:panelGrid>
+                    </p:fieldset>                          
+                </h:form>
+            <p:dialog header="Buscar por Nombre" id="buscarcliente" widgetVar="dlgbuscar" height="500" width="700" position="top" positionType="absolute" style="">
+                    <h:form id="buscar">
+                        <p:dataTable value="#{clienteController.clientes}" var="client" rows="10"
+                                     paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" filteredValue="#{clienteController.filteredclientes}"
+                                     selectionMode="single" selection="#{clienteController.cliente}" rowKey="#{client.persona.id}">
+                         <f:facet name="header">
+                                Clientes
+                         </f:facet>
+
+                              <p:column filterBy="#{client.persona.nombresociedad}" headerText="Sociedad" footerText="contains" filterMatchMode="contains">
+                                  <h:outputText value="#{client.persona.nombresociedad}" />
+                              </p:column>
+                              <p:column filterBy="#{client.persona.primernombre}" headerText="Nombre" footerText="contains" filterMatchMode="contains">
+                                  <h:outputText value="#{client.persona.primernombre}" />
+                              </p:column>
+                               <p:column headerText="NRC">
+                                  <h:outputText value="#{client.nrc}" />
+                               </p:column>
+                               <p:column headerText="Giro">
+                                   <h:outputText value="#{client.giro}" />
+                               </p:column>
+                               <p:column headerText="Tamaño Contribuyente">
+                                   <h:outputText value="#{client.rangocontribuy}" />
+                               </p:column>
+                            <f:facet name="footer">
+                                <p:commandButton action="#{clienteController.establecerClientePersona()}" update=":mttcliente" icon="ui-icon-search" value="Seleccionar"  oncomplete="PF('dlgbuscar').hide()" />
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+            </p:dialog> 
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>
