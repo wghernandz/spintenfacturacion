@@ -7,6 +7,7 @@ package com.spintenfacturacion.ejb;
 
 import com.spintenfacturacion.model.Factura;
 import com.spintenfacturacion.model.detalleFactura;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -34,5 +35,9 @@ public interface FacturaFacadeLocal {
     int obtenerUltimocorr(int idtipodoc);
     
     List<detalleFactura> imprimirDetalle(int idfactura);
+    
+    Factura facturaEnproceso();
+    
+    List<Factura> facturaRangofecha(Date finicial,Date ffinal);
     
 }

@@ -60,6 +60,16 @@ public class Factura implements Serializable {
     private vehiculoModelo vehiculomodelo;
     @Column(name="correlativo")
     private int correlativo;
+    @Column(name="estado")
+    private String estado;
+    @Column(name="acumventans")
+    private BigDecimal acumventans;
+    @Column(name="acumventaex")
+    private BigDecimal acumventaex;
+    @Column(name="acumventagra")
+    private BigDecimal acumventagra;
+    @Column(name="razanula")
+    private String razanula;
     
     public int getId() {
         return id;
@@ -172,4 +182,45 @@ public class Factura implements Serializable {
     public void setCorrelativo(int correlativo) {
         this.correlativo = correlativo;
     }
+    
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public BigDecimal getAcumventans() {
+        return acumventans;
+    }
+
+    public void setAcumventans(BigDecimal acumventans) {
+        this.acumventans = acumventans;
+    }
+
+    public BigDecimal getAcumventaex() {
+        return acumventaex;
+    }
+
+    public void setAcumventaex(BigDecimal acumventaex) {
+        this.acumventaex = acumventaex;
+    }
+
+    public BigDecimal getAcumventagra() {
+        return acumventagra;
+    }
+
+    public void setAcumventagra(BigDecimal acumventagra) {
+        this.acumventagra = acumventagra;
+    }
+
+    public String getRazanula() {
+        return razanula;
+    }
+
+    public void setRazanula(String razanula) {
+        this.razanula = razanula;
+    }
+    
 }

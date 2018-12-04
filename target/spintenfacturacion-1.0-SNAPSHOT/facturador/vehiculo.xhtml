@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"  
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <body>
+
+        <ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
+   
+ <ui:define name="content">
+ <h:form id="agregarmarca">
+    <h3>AGREGAR MARCA</h3>
+    <h:panelGrid columns="2" cellpadding="5">
+    <h:outputText value="Agregar Marca"/>
+    <p:inputText value="#{vehiculoController.marcavehiculo.nombremarca}" required="true" requiredMessage="Nombre Marca requerida"/>
+    <p:commandButton value="Agregar"  action="#{vehiculoController.guardarMarca()}" ajax="false" update="marca"/>
+    </h:panelGrid>
+</h:form>
+<h:form id="agregarmodelo">
+    <h3>AGREGAR MODELO</h3>
+    <h:panelGrid columns="4" cellpadding="2">
+    <h:outputText value="Seleccione Marca"/>
+    <p:selectOneMenu id="marca" value="#{vehiculoController.marcavehiculo.id}" required="true" requiredMessage="Marca requerida">
+        <f:selectItem itemLabel="Seleccione Marca" itemValue="" noSelectionOption="true"/>
+        <f:selectItems value="#{vehiculoController.marcasvehiculo}" var="marc" itemLabel="#{marc.nombremarca}" itemValue="#{marc.id}"/>
+    </p:selectOneMenu>
+    <h:outputText value="Agregar Modelo"/>
+    <p:inputText value="#{vehiculoController.vehiculomodelo.nombremodelo}" required="true" requiredMessage="Nombre modelo requerido"/>
+    <p:commandButton value="Agregar" action="#{vehiculoController.guardarModelo()}" ajax="false"></p:commandButton>
+    </h:panelGrid>
+</h:form>
+    <h:form id="formvehiculos" >
+        <p:dataTable id="tblestabc" var="modelo" value="#{vehiculoController.vehiculosmodelo}" 
+                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                 paginator="true" rows="10" style="margin-bottom:20px" widgetVar="vehiculostab" 
+                 emptyMessage="No Orden found with given criteria" filteredValue="#{vehiculoController.filteredmodelos}" >
+        
+        <f:facet name="{Exporters}">
+            <h:commandLink>
+                <p:graphicImage name="/imagenes/excel.png" width="24"/>
+                <p:dataExporter type="xls" target="tblestabc" fileName="cars" />
+            </h:commandLink>
+            <h:commandLink>
+                <p:graphicImage name="/imagenes/pdf.png" width="24"/>
+                <p:dataExporter type="pdf" target="tblestabc" fileName="cars"/>
+            </h:commandLink>
+        </f:facet>
+        
+        
+            <p:column filterBy="#{modelo.marcavehiculo.nombremarca}" headerText="Marca" footerText="contains" filterMatchMode="contains"  >
+            <f:facet name="header">
+                <h:outputText value="Marca" />
+            </f:facet>
+            <h:outputText value="#{modelo.marcavehiculo.nombremarca}" />
+        </p:column>
+        
+            <p:column filterBy="#{modelo.nombremodelo}" headerText="Modelo" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Modelo" />
+            </f:facet>
+            <p:commandLink update=":form6:migrid" oncomplete="PF('dlg').show();" action="#{vehiculoController.setVehiculomodelo(modelo)}" >
+                <h:outputText value="#{modelo.nombremodelo}" />
+            </p:commandLink>
+        </p:column>
+    </p:dataTable>
+ 
+    <h3>Exportar Datos solo de esta Página</h3>
+    <h:commandLink>
+        <p:graphicImage name="/imagenes/excel.png" />
+        <p:dataExporter type="xlsx" target="tblestabc" fileName="cars" pageOnly="true"/>
+    </h:commandLink>
+ 
+    <h:commandLink>
+        <p:graphicImage name="/imagenes/pdf.png" />
+        <p:dataExporter type="pdf" target="tblestabc" fileName="cars" pageOnly="true"  />
+    </h:commandLink>
+    </h:form>
+             <p:dialog header="Modificar" id="modmodelo" widgetVar="dlg" showEffect="explode" hideEffect="bounce" height="90" width="600" closable="false">
+                    <h:form id="form6">
+                        <h:panelGrid id="migrid" columns="4" cellpadding="2">
+                            <h:outputText value="Seleccione Marca"/>
+                            <p:selectOneMenu id="marcdlg" value="#{vehiculoController.marcavehiculo.id}" required="true" requiredMessage="Marca requerida">
+                                <f:selectItem itemLabel="Seleccione Marca" itemValue="" noSelectionOption="true"/>
+                                <f:selectItems value="#{vehiculoController.marcasvehiculo}" var="mar" itemLabel="#{mar.nombremarca}" itemValue="#{mar.id}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Agregar Modelo"/>
+                            <p:inputText id="modmodel" value="#{vehiculoController.vehiculomodelo.nombremodelo}" required="true" requiredMessage="Nombre modelo requerido"/>
+                            <p:commandButton value="Modificar" action="#{vehiculoController.modModelo}" ajax="false"></p:commandButton>
+                            <p:commandButton value="Cancelar" action="#{vehiculoController.cancelar()}" onclick="dlg.hide();" immediate="true"></p:commandButton>
+                        </h:panelGrid>
+                    </h:form>
+             </p:dialog>   
+    
+ </ui:define>  
+        
+    </ui:composition>
+
+    </body>
+</html>

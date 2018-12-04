@@ -25,7 +25,9 @@ public class tipoDocumento implements Serializable {
     private String nombredoc;
     @Column(name="codigo")
     private String codigo;
-
+    @Column(name="idsucursal")
+    private int idsucursal;
+            
     public int getId() {
         return id;
     }
@@ -48,6 +50,14 @@ public class tipoDocumento implements Serializable {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public int getIdsucursal() {
+        return idsucursal;
+    }
+
+    public void setIdsucursal(int idsucursal) {
+        this.idsucursal = idsucursal;
     }
     
 }

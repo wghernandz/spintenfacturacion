@@ -24,9 +24,10 @@
             <p:submenu label="FACTURAR" icon="">
                  <p:menuitem value="Nuevo" url="/facturador/nuevo.xhtml" />
                  <p:separator />
-                 <p:menuitem value="Anular" url="/facturador/anular.xhtml" />
+                 <p:menuitem value="Operaciones Factura" url="/facturador/operacionesfactura.xhtml" />
             </p:submenu>
-            <p:menuitem value="REPORTES FACTURACION" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
+            <p:menuitem value="DETALLES FACTURA" url="/facturador/detalle.xhtml" icon="ui-icon-folder-open" />
+            <p:menuitem value="REPORTES FACTURACION" url="/facturador/rptfacturacion.xhtml" icon="ui-icon-folder-open" />
         </p:submenu>
         <p:submenu label="CLIENTES" icon="ui-icon-folder-collapsed" >
             <p:menuitem value="CLIENTE" url="/facturador/cliente.xhtml" icon="ui-icon-folder-open" />
@@ -37,13 +38,12 @@
             <p:menuitem value="REPORTES CORRELATIVO" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
         </p:submenu>
          <p:submenu label="VEHICULOS" icon="ui-icon-folder-collapsed" >
-            <p:menuitem value="AGREGAR VEHICULO" url="/facturador/vehiculos.xhtml" icon="ui-icon-folder-open" />
+            <p:menuitem value="AGREGAR VEHICULO" url="/facturador/vehiculo.xhtml" icon="ui-icon-folder-open" />
         </p:submenu>
     </p:menubar>
 </h:form>
             
     </div>
-
         <div id="content" class="center_content">
             <ui:insert name="content">Content</ui:insert>
         </div>
@@ -51,7 +51,6 @@
         <div id="bottom">
             <ui:insert name="bottom">Bottom</ui:insert>
         </div>
-
 </h:body>
 
 </html>

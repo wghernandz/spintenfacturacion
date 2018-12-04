@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <body>
+        
+<ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
+
+<ui:define name="content">
+    <h:form id="opfact">
+           
+    <p:dataTable id="tbl" var="factura" value="#{opfacturaController.facturas}"
+                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                 paginator="true" rows="20" style="margin-bottom:20px" widgetVar="opfactura" 
+                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{opfacturaController.facturasFiltered}">
+ 
+        <f:facet name="{Exporters}">
+            <h:commandLink>
+                <p:graphicImage name="/imagenes/excel.png" width="24"/>
+                <p:dataExporter type="xls" target="tbl" fileName="Ordenes-por-Asignar" />
+            </h:commandLink>
+ 
+            <h:commandLink>
+                <p:graphicImage name="/imagenes/pdf.png" width="24"/>
+                <p:dataExporter type="pdf" target="tbl" fileName="Ordenes-por-Asignar" />
+            </h:commandLink>
+ 
+        </f:facet>
+        <p:column width="60" filterBy="#{opfacturaController.getDateAsString(factura.fecha)}" headerText="Fecha" footerText="contains" filterMatchMode="contains" exportable="false" >
+            <f:facet name="header">
+                <h:outputText value="Fecha" />
+            </f:facet>
+            <h:outputText value="#{opfacturaController.getDateAsString(factura.fecha)}" ></h:outputText>
+        </p:column>
+                        
+        <p:column width="270" filterBy="#{factura.correlativodoc.tipodocumento.nombredoc}" headerText="Tipo Documento" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Tipo Documento" />
+            </f:facet>
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('opfactura').filter()" styleClass="custom-filter" style="width: 200px;">
+                    <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{opfacturaController.listatipodocumento}" var="tipodoc" itemValue="#{tipodoc.nombredoc}" itemLabel="#{tipodoc.nombredoc}" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{factura.correlativodoc.tipodocumento.nombredoc}" />
+        </p:column>
+        
+        <p:column width="60" filterBy="#{factura.correlativo}" headerText="Correlativo" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Correlativo" />
+            </f:facet>
+            <p:commandLink update=":form5" oncomplete="PF('dlganular').show();" action="#{opfacturaController.setFactura(factura)}" >
+             <h:outputText value="#{factura.correlativo}"/>
+            </p:commandLink>
+        </p:column>
+        
+        <p:column width="60">
+            <f:facet name="header"> 
+                <h:outputText value="Valor Neto" />
+            </f:facet>
+            <h:outputText value="#{factura.acumventagra}" >
+                <f:convertNumber type="number" pattern="$ 0.00"/>
+            </h:outputText>
+        </p:column>
+                        
+        <p:column width="60">
+            <f:facet name="header">
+                <h:outputText value="Valor Exento" />
+            </f:facet>
+            <h:outputText value="#{factura.acumventaex}" >
+            <f:convertNumber type="number" pattern="$ 0.00"/>
+            </h:outputText>
+        </p:column>
+        
+        <p:column width="60">
+            <f:facet name="header">
+                <h:outputText value="Valor No Sujeto" />
+            </f:facet>
+            <h:outputText value="#{factura.acumventans}" >
+            <f:convertNumber type="number" pattern="$ 0.00"/>
+            </h:outputText>
+        </p:column> 
+        
+        <p:column width="50" filterBy="#{factura.estado}" headerText="Estado" footerText="contains" filterMatchMode="contains" >   
+            <f:facet name="header">
+                <h:outputText value="Estado" />
+            </f:facet>
+            <h:outputText value="#{factura.estado}" />
+        </p:column>
+                        
+        <p:column filterBy="#{factura.ordencompra}" headerText="Orden Compra" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Ord.Compra" />
+            </f:facet>
+            <h:outputText value="#{factura.ordencompra}" />
+        </p:column>
+                        
+        <p:column width="80" filterBy="#{factura.numsiniestro}" headerText="Num Siniestro" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Num.Siniestro" />
+            </f:facet>
+            <h:outputText value="#{factura.numsiniestro}" />
+        </p:column>
+                        
+        <p:column filterBy="#{factura.placa}" headerText="Placa" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Placa" />
+            </f:facet>
+            <h:outputText value="#{factura.placa}" />
+        </p:column>
+                        
+        <p:column filterBy="#{factura.vehiculomodelo.marcavehiculo.nombremarca}" headerText="Marca" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Marca" />
+            </f:facet>
+             <h:outputText value="#{factura.vehiculomodelo.marcavehiculo.nombremarca}" />
+        </p:column>
+                        
+        <p:column filterBy="#{factura.vehiculomodelo.nombremodelo}" headerText="Modelo" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Modelo" />
+            </f:facet>
+            <h:outputText value="#{factura.vehiculomodelo.nombremodelo}" />
+        </p:column>
+        
+   </p:dataTable>    
+   </h:form>  
+        <p:dialog header="ANULAR/DESANULAR" id="anul" widgetVar="dlganular" showEffect="explode" hideEffect="bounce" height="125" width="800" dynamic="true">
+            <h:form id="form5">
+                <p:growl id="mismsg" />
+                <h:panelGrid columns="4">
+                    <h:outputText value="Tipo de Documento"/>
+                    <p:inputText value="#{opfacturaController.factura.correlativodoc.tipodocumento.nombredoc}" disabled="true" style="width: 300px;"/>
+                    <h:outputText value="Numero de Documento"/>
+                    <p:inputText value="#{opfacturaController.factura.correlativo}" disabled="true"/>
+                    <h:outputText value="Razon de anulacion" />
+                    <p:inputText value="#{opfacturaController.factura.razanula}" style="width: 300px;" required="true" requiredMessage="Falta razon de anulacion" disabled="#{opfacturaController.estado=='Anulada'}"/>
+                    <p:commandButton id="botonanular" value="ANULAR" action="#{opfacturaController.anularFactura()}" update=":opfact" rendered="#{opfacturaController.estado=='Finalizado'}" onsuccess=":mismsg" />
+                    <p:commandButton id="botondesanular" value="DESANULAR" action="#{opfacturaController.desanularFactura()}" update=":opfact" rendered="#{opfacturaController.estado=='Anulada'}" onsuccess=":mismsg" />
+                    <p:commandButton value="CANCELAR" onclick="dlganular.hide();" immediate="true" />
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>     
+   </ui:define>
+</ui:composition>     
+</body>
+</html>

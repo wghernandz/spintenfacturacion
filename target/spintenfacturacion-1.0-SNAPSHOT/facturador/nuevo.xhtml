@@ -13,9 +13,9 @@
             <ui:define name="content">
                 
                 <h:form id="nuevo" style=".ui-dialog{position: absolute !important;}">
-                    <p:growl id="msgs" showDetail="true"/>
+                    <p:growl id="msgs" showDetail="true" autoUpdate="true"/>
                  
-                    <p:fieldset style="margin-left: 900px">
+                    <p:fieldset id="tventa" style="margin-left: 900px">
                         <h1 style="text-align: left;" >TOTAL $ <h:outputLabel value="#{nuevaFacturaController.factura.totalventa}"/></h1>       
                     </p:fieldset>
                      <p:fieldset>
@@ -212,7 +212,7 @@
                             </p:column>
                             <p:column>
                                  <p:commandButton type="button" icon="ui-icon-close">
-                                  <p:ajax event="click" listener="#{nuevaFacturaController.onRowDelete(Event,detallefactura)}" disabled="#{nuevaFacturaController.guardarcambios}" update=":detallef:detalle,:nuevo" />
+                                  <p:ajax event="click" listener="#{nuevaFacturaController.onRowDelete(Event,detallefactura)}" disabled="#{nuevaFacturaController.guardarcambios}" update=":detallef:detalle,:detallef:basic,:nuevo:tventa" />
                                  </p:commandButton>
                             </p:column>   
                             </p:dataTable>
@@ -229,7 +229,7 @@
                                 <p:row>
                                     <h:panelGrid id="ccf" columns="2" width="250" rendered="#{nuevaFacturaController.tipodocumento.id==45 or nuevaFacturaController.tipodocumento.id==46 or nuevaFacturaController.tipodocumento.id==49 or nuevaFacturaController.tipodocumento.id==50 or nuevaFacturaController.tipodocumento.id==51 or nuevaFacturaController.tipodocumento.id==52}">
                                         <h:outputText value="SUMAS"/>
-                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentagra}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.factura.acumventagra}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="13% IVA"/>
                                         <h:outputText style="text-align: right" value="#{nuevaFacturaController.iva}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="SUBTOTAL"/>
@@ -237,9 +237,9 @@
                                         <h:outputText value="(-) IVA RETENIDO"/>
                                         <h:outputText style="text-align: right" id="retencion" value="#{nuevaFacturaController.factura.retencion}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTAS EXENTAS"/>
-                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.factura.acumventaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTA NO SUJETA"/>
-                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.factura.acumventans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTA TOTAL"/>
                                         <h:outputText style="text-align: right" id="vtotal" value="#{nuevaFacturaController.factura.totalventa}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                     </h:panelGrid>
@@ -251,14 +251,14 @@
                                         <h:outputText value="SUBTOTAL"/>
                                         <h:outputText style="text-align: right"  id="subtotalfac" value="#{nuevaFacturaController.subtotal}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTAS EXENTAS"/>
-                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.factura.acumventaex}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTA NO SUJETA"/>
-                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.acumulatorVentans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
+                                        <h:outputText style="text-align: right" value="#{nuevaFacturaController.factura.acumventans}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                         <h:outputText value="VENTA TOTAL"/>
                                         <h:outputText style="text-align: right" id="vtotalfcfinal" value="#{nuevaFacturaController.factura.totalventa}"><f:convertNumber type="number" pattern="$ 0.00"/></h:outputText>
                                     </h:panelGrid>
                                  </p:row>
-                               </f:facet>
+                           </f:facet>
                
                      </p:panel>
                               

@@ -20,7 +20,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name="cliente")
 public class Cliente implements Serializable {
-    
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="SEQ_ID_CLIENTE")
     @SequenceGenerator(name="SEQ_ID_CLIENTE",sequenceName="seq_idcliente", allocationSize=1)

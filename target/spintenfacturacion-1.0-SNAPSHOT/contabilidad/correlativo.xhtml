@@ -11,13 +11,20 @@
 
             <ui:define name="content">
                 <h:form id="ingresocorr">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Tipo de Documento"/>
+                        <p:selectOneMenu id="tipodoc" value="#{correlativoController.tipodocumento.id}">
+                            <f:selectItem itemLabel="Seleccione tipo Doc" />
+                            <f:selectItems value="#{correlativoController.tiposdoc}" var="doc" itemLabel="#{doc.nombredoc}" itemValue="#{doc.id}"  />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
                 <h:panelGrid columns="8">
                     <h:outputText value="Numero de Resolucion" />
                     <p:inputText id="numresolucion" value="#{correlativoController.correlativodoc.nresolucion}"/>
                     <h:outputText value="Fecha de Autorizacion" />
                     <p:calendar id="fechaut" value="#{correlativoController.correlativodoc.fautorizacion}"/>
                     <h:outputText value="Serie Autorizada del"/>
-                    <p:inputText id="fechautinic" value="#{correlativoController.correlativodoc.serieautini}" />
+                    <p:inputText id="fechautinic" value="#{correlativoController.correlativodoc.serieautini}"/>
                     <h:outputText value="Serie Autorizada al" />
                     <p:inputText id="fechautfin" value="#{correlativoController.correlativodoc.serieautfin}" />
                     <p:commandButton value="AGREGAR" action="#{correlativoController.guardarCorrelativo()}"/>
@@ -32,17 +39,23 @@
                             </f:facet>
                  
                             
-                            <p:column headerText="NUM RESOLUCION" width="50">
+                            <p:column headerText="NUM RESOLUCION" width="300">
                                 <h:outputText value="#{corr.nresolucion}"></h:outputText>                        
                             </p:column>
-                            <p:column headerText="FECHA AUTORIZACION" width="500">
-                                <h:outputText value="#{corr.fautorizacion}"></h:outputText>
+                            <p:column headerText="FECHA AUTORIZACION" width="100">
+                                <h:outputText value="#{corr.fautorizacion}"><f:convertDateTime type="date" pattern="dd-MM-yyyy"/></h:outputText>
                             </p:column>
                             <p:column headerText="DEL">
                                 <h:outputText value="#{corr.serieautini}" />                           
                             </p:column>
                             <p:column headerText="AL">
                                 <h:outputText value="#{corr.serieautfin}"></h:outputText>
+                            </p:column>
+                             <p:column headerText="CORR INICIO">
+                                 <h:outputText value="#{corr.cinicial}"></h:outputText>
+                            </p:column>
+                            <p:column headerText="CORR FIN">
+                                <h:outputText value="#{corr.cfinal}"></h:outputText>
                             </p:column>
                             <p:column headerText="ESTADO">
                                 <h:outputText value="#{corr.estado}"></h:outputText>     
@@ -52,8 +65,7 @@
                                     <p:ajax event="click" listener="#{correlativoController.onRowEdit(Event,corr)}" disabled="#{correlativoController.enmodificacion}" update="ingresocorr" />
                                 </p:commandButton>
                             </p:column> 
-                            </p:dataTable>
-                    
+                    </p:dataTable>
                 </h:form>
                 
             </ui:define>

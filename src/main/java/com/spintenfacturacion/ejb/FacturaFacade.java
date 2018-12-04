@@ -15,6 +15,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -56,7 +57,7 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
             corr=correlativodoc.getId();
             System.out.println("VALOR DE CORRELATIVO"+corr);
         }else{
-             ultimocorr = -1;
+             ultimocorr = -1;//NO EXISTE
             }
                 //si existe el correlativo, entonces buscar en factura el ultimo utilizado
                 if(ultimocorr!=-1){  
@@ -75,8 +76,7 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       }
       return ultimocorr;
     }
-    
-    
+     
     //PARA IMPRIMIR FACTURA
     @Override
     public List<detalleFactura> imprimirDetalle(int id){
@@ -94,5 +94,43 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       }
       return lista;
     } 
+    
+    //PARA IMPRIMIR FACTURA
+    @Override
+    public Factura facturaEnproceso(){
+      Factura factura = null;
+      List<Factura> lista=null;
+      try{
+        String consulta;
+        consulta="SELECT f  FROM Factura f WHERE f.estado = 'En proceso' ";
+        Query query=em.createQuery(consulta);
+        
+        lista = query.getResultList();
+        factura=(Factura)lista.get(0);
+        System.out.println("Valor de LISTA "+lista.get(0).getId());
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return factura;
+    }
+      
+    //obtener listado de facturas segun rango de fechas.
+    @Override
+    public List<Factura> facturaRangofecha(Date fini,Date ffin){
+      List<Factura> lista = null;
+      try{
+        String consulta;
+        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.correlativodoc.tipodocumento.id,f.fecha,f.correlativo";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,fini,TemporalType.DATE);
+        query.setParameter(2,ffin,TemporalType.DATE);
+        
+        lista = query.getResultList();
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return lista;
+    } 
+    
     
 }

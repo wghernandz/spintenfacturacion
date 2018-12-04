@@ -30,4 +30,6 @@ public interface correlativoDocFacadeLocal {
 
     int count();
     
+    public int obtenerCorrInicial(int iddoc);
+    
 }
