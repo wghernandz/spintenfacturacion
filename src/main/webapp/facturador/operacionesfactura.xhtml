@@ -17,7 +17,7 @@
     <p:dataTable id="tbl" var="factura" value="#{opfacturaController.facturas}"
                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
                  paginator="true" rows="20" style="margin-bottom:20px" widgetVar="opfactura" 
-                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{opfacturaController.facturasFiltered}">
+                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{opfacturaController.facturasFiltered}" sortBy="#{factura.correlativo}" sortOrder="descending">
  
         <f:facet name="{Exporters}">
             <h:commandLink>
@@ -31,14 +31,14 @@
             </h:commandLink>
  
         </f:facet>
-        <p:column width="60" filterBy="#{opfacturaController.getDateAsString(factura.fecha)}" headerText="Fecha" footerText="contains" filterMatchMode="contains" exportable="false" >
+        <p:column width="55" filterBy="#{opfacturaController.getDateAsString(factura.fecha)}" headerText="Fecha" footerText="contains" filterMatchMode="contains" exportable="false" >
             <f:facet name="header">
                 <h:outputText value="Fecha" />
             </f:facet>
-            <h:outputText value="#{opfacturaController.getDateAsString(factura.fecha)}" ></h:outputText>
+            <h:outputText value="#{opfacturaController.getDateAsString(factura.fecha)}" style="font-size: 12px;"></h:outputText>
         </p:column>
                         
-        <p:column width="270" filterBy="#{factura.correlativodoc.tipodocumento.nombredoc}" headerText="Tipo Documento" footerText="contains" filterMatchMode="contains">
+        <p:column width="215" filterBy="#{factura.correlativodoc.tipodocumento.nombredoc}" headerText="Tipo Documento" footerText="contains" filterMatchMode="contains">
             <f:facet name="header">
                 <h:outputText value="Tipo Documento" />
             </f:facet>
@@ -48,12 +48,19 @@
                     <f:selectItems value="#{opfacturaController.listatipodocumento}" var="tipodoc" itemValue="#{tipodoc.nombredoc}" itemLabel="#{tipodoc.nombredoc}" />
                 </p:selectOneMenu>
             </f:facet>
-            <h:outputText value="#{factura.correlativodoc.tipodocumento.nombredoc}" />
+            <h:outputText value="#{factura.correlativodoc.tipodocumento.nombredoc}" style="font-size: 11px;" />
         </p:column>
         
-        <p:column width="60" filterBy="#{factura.correlativo}" headerText="Correlativo" footerText="contains" filterMatchMode="contains">
+        <p:column width="140" filterBy="#{factura.cliente.persona}" headerText="Correlativo" footerText="contains" filterMatchMode="contains" style="font-size: 12px;">
             <f:facet name="header">
-                <h:outputText value="Correlativo" />
+                <h:outputText value="Cliente" />
+            </f:facet>
+            <h:outputText value="#{factura.cliente.persona.nombresociedad} #{factura.cliente.persona.primernombre} #{factura.cliente.persona.segundonombre} #{factura.cliente.persona.primerapellido} #{factura.cliente.persona.segundoapellido}"/>
+        </p:column>
+        
+        <p:column width="35" filterBy="#{factura.correlativo}" headerText="Correlativo" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Corr." />
             </f:facet>
             <p:commandLink update=":form5" oncomplete="PF('dlganular').show();" action="#{opfacturaController.setFactura(factura)}" >
              <h:outputText value="#{factura.correlativo}"/>
@@ -69,7 +76,7 @@
             </h:outputText>
         </p:column>
                         
-        <p:column width="60">
+        <p:column width="45" style="font-size: 12px;">
             <f:facet name="header">
                 <h:outputText value="Valor Exento" />
             </f:facet>
@@ -78,7 +85,7 @@
             </h:outputText>
         </p:column>
         
-        <p:column width="60">
+        <p:column width="45" style="font-size: 12px">
             <f:facet name="header">
                 <h:outputText value="Valor No Sujeto" />
             </f:facet>
@@ -87,21 +94,21 @@
             </h:outputText>
         </p:column> 
         
-        <p:column width="50" filterBy="#{factura.estado}" headerText="Estado" footerText="contains" filterMatchMode="contains" >   
+        <p:column width="45" filterBy="#{factura.estado}" headerText="Estado" footerText="contains" filterMatchMode="contains" style="font-size: 12px;" >   
             <f:facet name="header">
                 <h:outputText value="Estado" />
             </f:facet>
             <h:outputText value="#{factura.estado}" />
         </p:column>
                         
-        <p:column filterBy="#{factura.ordencompra}" headerText="Orden Compra" footerText="contains" filterMatchMode="contains">
+        <p:column filterBy="#{factura.ordencompra}" headerText="Orden Compra" footerText="contains" filterMatchMode="contains" width="60">
             <f:facet name="header">
                 <h:outputText value="Ord.Compra" />
             </f:facet>
             <h:outputText value="#{factura.ordencompra}" />
         </p:column>
                         
-        <p:column width="80" filterBy="#{factura.numsiniestro}" headerText="Num Siniestro" footerText="contains" filterMatchMode="contains">
+        <p:column width="60" filterBy="#{factura.numsiniestro}" headerText="Num Siniestro" footerText="contains" filterMatchMode="contains">
             <f:facet name="header">
                 <h:outputText value="Num.Siniestro" />
             </f:facet>
@@ -127,6 +134,13 @@
                 <h:outputText value="Modelo" />
             </f:facet>
             <h:outputText value="#{factura.vehiculomodelo.nombremodelo}" />
+        </p:column>
+        
+        <p:column headerText="Modelo" >
+            <f:facet name="header">
+                <h:outputText value="NOTA CREDITO" />
+            </f:facet>
+            <h:outputText value="#{factura.idccfajustado!=0 ? opfacturaController.ncnd(factura.idccfajustado): opfacturaController.factNCND(factura.id)}" />
         </p:column>
         
    </p:dataTable>    

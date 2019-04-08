@@ -6,6 +6,7 @@
 package com.spintenfacturacion.ejb;
 
 import com.spintenfacturacion.model.Departamento;
+import com.spintenfacturacion.model.Municipio;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -30,4 +31,5 @@ public interface DepartamentoFacadeLocal {
 
     int count();
     
+    List<Municipio> deptoXmunicipio(Departamento depto);
 }

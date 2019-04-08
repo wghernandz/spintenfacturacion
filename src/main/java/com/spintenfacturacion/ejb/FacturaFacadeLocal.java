@@ -6,6 +6,7 @@
 package com.spintenfacturacion.ejb;
 
 import com.spintenfacturacion.model.Factura;
+import com.spintenfacturacion.model.correlativoDoc;
 import com.spintenfacturacion.model.detalleFactura;
 import java.util.Date;
 import java.util.List;
@@ -40,4 +41,9 @@ public interface FacturaFacadeLocal {
     
     List<Factura> facturaRangofecha(Date finicial,Date ffinal);
     
+    List<Factura> facturaSucursal(int idsucursal);
+    
+    Factura facturaConncnd(int idfact);
+    
+    boolean existeCorr(correlativoDoc corr,int corrabuscar);    
 }

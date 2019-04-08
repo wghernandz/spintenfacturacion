@@ -31,3 +31,7 @@ a:link:hover, a:visited:hover  {
 .ui-dialog { top: 100px !important; }
 
 .ui-dialog { position: absolute !important; }
+
+.ui-confirm-dialog {top: 400px !important;}
+
+.ui-confirm-dialog-message{font-size: 18px;}

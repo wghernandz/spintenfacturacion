@@ -53,4 +53,48 @@ public class tipoDocumentoFacade extends AbstractFacade<tipoDocumento> implement
       return corr;
     }
     
+        //Obtener listado de documentos segun sucursal.
+    @Override
+    public List<tipoDocumento> docXsucursal(int idsucursal){
+      List<tipoDocumento> lista=null;
+      tipoDocumento tdoc=null;
+
+      String consulta;
+      try{
+        consulta="SELECT t FROM tipoDocumento t WHERE t.idsucursal = ?1 ";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1, idsucursal);
+      
+        lista= query.getResultList();
+      if (!lista.isEmpty()){
+          tdoc=lista.get(0);
+      }
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return lista;
+    }
+    
+          //Obtener doc. para usuario serviradiadores
+    @Override
+    public List<tipoDocumento> userServi(){
+      List<tipoDocumento> lista=null;
+      tipoDocumento tdoc=null;
+
+      String consulta;
+      try{
+        consulta="SELECT t FROM tipoDocumento t WHERE t.idsucursal=1 OR t.id=3 OR t.id=5 ";
+        Query query=em.createQuery(consulta);
+      
+        lista= query.getResultList();
+      if (!lista.isEmpty()){
+          tdoc=lista.get(0);
+      }
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return lista;
+    }
+    
+    
 }

@@ -43,6 +43,8 @@ public class correlativoDoc implements Serializable {
     private String serieautini;
     @Column(name="serieautfin")
     private String serieautfin;
+    @Column(name="ultimo")
+    private int ultimo;
  
     public int getId() {
         return id;
@@ -115,5 +117,12 @@ public class correlativoDoc implements Serializable {
     public void setSerieautfin(String serieautfin) {
         this.serieautfin = serieautfin;
     }
-    
+
+    public int getUltimo() {
+        return ultimo;
+    }
+
+    public void setUltimo(int ultimo) {
+        this.ultimo = ultimo;
+    }
 }

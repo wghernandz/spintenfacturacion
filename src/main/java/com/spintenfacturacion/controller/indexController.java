@@ -97,34 +97,32 @@ public class indexController implements Serializable {
         
         try{
             us=usuarioEJB.Login(usuario);
+            System.out.println("usuario + "+us.getUsername());
             if(us!=null){
                 
-                 redireccion="/facturador/nuevo.xhtml";
-            /*    role=usuarioEJB.usuarioRole(us);
-         
-                switch(role.getRoleus().getId()){
-                    case 1:
-                        redireccion="/operativo/principal.xhtml";
+                 //redireccion="/facturador/nuevo.xhtml";
+                role=usuarioEJB.usuarioRole(us);
+                System.out.println("role + "+role);
+                switch(role.getRole().getId()){
+                    case 21:
+                        redireccion="/facturador/nuevo.xhtml";
                         break;
-                    case 2:
-                        redireccion="/operativo/principal.xhtml";
+                    case 22:
+                        redireccion="/facturador/operacionesfactura.xhtml";
                         break;
-                    case 3:
-                        redireccion="/gerente/establecimientoCostosmo.xhtml";
+                    case 23:
+                        redireccion="/facturador/nuevo.xhtml";
                         break;
-                    case 4:
-                        redireccion="/jefetaller/listaOrdenesporasignar.xhtml";
-                        break;
-                    case 5:
-                        redireccion="/contabilidad/ingresooperarios.xhtml";
+                    case 24:
+                        redireccion="/facturador/nuevo.xhtml";
                         break;
                     default:
-                        redireccion="/operativo/principal.xhtml";
+                        redireccion="/facturador/nuevo.xhtml";
                         break;
                 }
                 //ABRIR VARIABLE DE SESION
                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuarioactivo",us);
-               FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("mirol", role);*/
+               FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("mirol", role);
             }else{
                 FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(FacesMessage.SEVERITY_WARN,"Aviso","Credenciales Incorrectas :("));
             }

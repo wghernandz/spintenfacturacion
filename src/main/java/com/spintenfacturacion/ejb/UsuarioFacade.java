@@ -65,7 +65,7 @@ public class UsuarioFacade extends AbstractFacade<Usuario> implements UsuarioFac
       String consulta;
       
       try{
-        consulta="SELECT ur FROM usuarioRole ur WHERE ur.usuario.idpersona = ?1 ";
+        consulta="SELECT ur FROM usuarioRole ur WHERE ur.usuario.persona.id = ?1 ";
         Query query=em.createQuery(consulta);
         query.setParameter(1, user.getPersona().getId());
       

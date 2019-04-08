@@ -168,6 +168,7 @@ public class correlativoController implements Serializable{
     
     public void onRowEdit(Event event, correlativoDoc correlativo){
         this.setCorrelativodoc(correlativo);
+        this.setTipodocumento(correlativo.getTipodocumento());
         this.enmodificacion=true;
     }
 

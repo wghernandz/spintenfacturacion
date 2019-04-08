@@ -45,7 +45,7 @@ public class NumeroLetras {
         if (triMiles > 0)       result.append(triTexto(triMiles).toString() + "MIL ");
         if (triUnidades > 0)    result.append(triTexto(triUnidades).toString());
  
-        return result.toString()+"CON "+fraccionsinpuntodec+"/100 DOLARES DE LOS ESTADOS UNIDOS DE AMERICA";
+        return result.toString()+"CON "+fraccionsinpuntodec+"/100 DOLARES";
     }
  
     /**
@@ -109,7 +109,7 @@ public class NumeroLetras {
  
         switch (unidades) {
             case 0: break;
-            case 1: result.append("UN "); break;
+            case 1: result.append("UNO "); break;
             case 2: result.append("DOS "); break;
             case 3: result.append("TRES "); break;
             case 4: result.append("CUATRO "); break;

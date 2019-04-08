@@ -31,5 +31,9 @@ public interface tipoDocumentoFacadeLocal {
 
     int count();
     
-    correlativoDoc correlativoDocUso(int tipodoc);  
+    correlativoDoc correlativoDocUso(int tipodoc);
+    
+    List<tipoDocumento> docXsucursal(int idsucursal);
+    
+    public List<tipoDocumento> userServi();
 }

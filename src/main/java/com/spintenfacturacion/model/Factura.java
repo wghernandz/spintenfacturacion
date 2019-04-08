@@ -34,7 +34,7 @@ public class Factura implements Serializable {
     private correlativoDoc correlativodoc;
     @ManyToOne
     @JoinColumn(name="idpersona")
-    private Persona persona;
+    private Usuario usuario;
     @ManyToOne
     @JoinColumn(name="clienteidpersona")
     private Cliente cliente;
@@ -70,6 +70,8 @@ public class Factura implements Serializable {
     private BigDecimal acumventagra;
     @Column(name="razanula")
     private String razanula;
+    @Column(name="idccfajustado")
+    private int idccfajustado;
     
     public int getId() {
         return id;
@@ -87,12 +89,12 @@ public class Factura implements Serializable {
         this.correlativodoc = correlativodoc;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public Cliente getCliente() {
@@ -221,6 +223,14 @@ public class Factura implements Serializable {
 
     public void setRazanula(String razanula) {
         this.razanula = razanula;
+    }
+
+    public int getIdccfajustado() {
+        return idccfajustado;
+    }
+
+    public void setIdccfajustado(int idccfajustado) {
+        this.idccfajustado = idccfajustado;
     }
     
 }

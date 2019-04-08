@@ -1,7 +1,7 @@
 package com.spintenfacturacion.model;
 
 import com.spintenfacturacion.model.Cliente;
-import com.spintenfacturacion.model.Persona;
+import com.spintenfacturacion.model.Usuario;
 import com.spintenfacturacion.model.correlativoDoc;
 import com.spintenfacturacion.model.vehiculoModelo;
 import java.math.BigDecimal;
@@ -10,12 +10,13 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2018-11-28T11:18:19")
+@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2019-04-05T08:21:39")
 @StaticMetamodel(Factura.class)
 public class Factura_ { 
 
     public static volatile SingularAttribute<Factura, vehiculoModelo> vehiculomodelo;
     public static volatile SingularAttribute<Factura, Date> fecha;
+    public static volatile SingularAttribute<Factura, Usuario> usuario;
     public static volatile SingularAttribute<Factura, String> razanula;
     public static volatile SingularAttribute<Factura, BigDecimal> retencion;
     public static volatile SingularAttribute<Factura, Integer> correlativo;
@@ -31,7 +32,7 @@ public class Factura_ {
     public static volatile SingularAttribute<Factura, correlativoDoc> correlativodoc;
     public static volatile SingularAttribute<Factura, BigDecimal> acumventaex;
     public static volatile SingularAttribute<Factura, BigDecimal> acumventans;
-    public static volatile SingularAttribute<Factura, Persona> persona;
+    public static volatile SingularAttribute<Factura, Integer> idccfajustado;
     public static volatile SingularAttribute<Factura, String> tventaenletras;
 
 }

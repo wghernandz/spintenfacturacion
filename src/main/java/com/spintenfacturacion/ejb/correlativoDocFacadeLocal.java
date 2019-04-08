@@ -32,4 +32,8 @@ public interface correlativoDocFacadeLocal {
     
     public int obtenerCorrInicial(int iddoc);
     
+    public correlativoDoc corrdocTipoDoc(int iddoc);
+
+    public correlativoDoc actEstadoCorr(int idcorr);
+    
 }

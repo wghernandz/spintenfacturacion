@@ -9,8 +9,10 @@ import com.spintenfacturacion.model.correlativoDoc;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.StoredProcedureQuery;
 
 /**
  *
@@ -56,4 +58,56 @@ public class correlativoDocFacade extends AbstractFacade<correlativoDoc> impleme
       
     }
     
+    //OBTENER correlativo segun tipo de documento y estado
+    @Override
+    public correlativoDoc corrdocTipoDoc(int iddoc){
+       List<correlativoDoc> correlativos;
+       correlativoDoc correlativo=null;
+       
+       try{
+        String consulta;
+        consulta=" SELECT c FROM correlativoDoc c where c.tipodocumento.id = ?1 and c.estado='en uso' ";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,iddoc);
+        
+        correlativos = query.getResultList();
+        correlativo=(correlativoDoc)correlativos.get(0);
+        
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+       return correlativo;
+    }
+    
+       //actualizar estado de correlativo documento
+    @Override
+    public correlativoDoc actEstadoCorr(int idcorr){
+      //boolean resultado;
+      correlativoDoc correlativo = null;
+      
+      try{
+      StoredProcedureQuery storedProcedure=em.createStoredProcedureQuery("actEstadocorr");
+      storedProcedure.registerStoredProcedureParameter("idcorr",int.class ,ParameterMode.IN);
+      storedProcedure.setParameter("idcorr", idcorr);
+      storedProcedure.execute();
+        //resultado=true;
+      System.out.println("procedimiento ejecutado");
+      }catch(Exception e){
+        //resultado=false;
+      }
+      
+      
+        try{
+        String consulta="SELECT c FROM correlativoDoc c WHERE c.id = ?1 ";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,idcorr);
+        
+        correlativo = (correlativoDoc)query.getSingleResult();
+    
+      }catch (Exception e){
+        System.out.println(e.getMessage());
+      }
+      return correlativo;
+        //return resultado;
+    } 
 }

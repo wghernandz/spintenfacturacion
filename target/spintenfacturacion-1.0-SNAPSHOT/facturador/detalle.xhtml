@@ -17,7 +17,7 @@
         <p:dataTable id="tbl" var="detalle" value="#{detalleController.detallesfactura}"
                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
                  paginator="true" rows="20" style="margin-bottom:20px" widgetVar="opfactura" 
-                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{detalleController.detallesfiltered}">
+                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{detalleController.detallesfiltered}" sortBy="#{detalle.factura.correlativo}" sortOrder="descending">
  
         <f:facet name="{Exporters}">
             <h:commandLink>
@@ -31,14 +31,14 @@
             </h:commandLink>
  
         </f:facet>
-        <p:column width="60" filterBy="#{detalleController.getDateAsString(detalle.factura.fecha)}" headerText="Fecha" footerText="equals" filterMatchMode="contains" exportable="false" >
+        <p:column width="50" filterBy="#{detalleController.getDateAsString(detalle.factura.fecha)}" headerText="Fecha" footerText="equals" filterMatchMode="contains" exportable="false" style="font-size: 12px;" >
             <f:facet name="header">
                 <h:outputText value="Fecha" />
             </f:facet>
             <h:outputText value="#{detalleController.getDateAsString(detalle.factura.fecha)}"></h:outputText>
         </p:column>
                         
-        <p:column width="260" filterBy="#{detalle.factura.correlativodoc.tipodocumento.nombredoc}" headerText="Tipo Documento" footerText="contains" filterMatchMode="contains">
+        <p:column width="215" filterBy="#{detalle.factura.correlativodoc.tipodocumento.nombredoc}" headerText="Tipo Documento" footerText="contains" filterMatchMode="contains">
             <f:facet name="header">
                 <h:outputText value="Tipo Documento" />
             </f:facet>
@@ -48,26 +48,33 @@
                     <f:selectItems value="#{detalleController.listatipodocumento}" var="tipodoc" itemValue="#{tipodoc.nombredoc}" itemLabel="#{tipodoc.nombredoc}" />
                 </p:selectOneMenu>
             </f:facet>
-            <h:outputText value="#{detalle.factura.correlativodoc.tipodocumento.nombredoc}"/>
+            <h:outputText value="#{detalle.factura.correlativodoc.tipodocumento.nombredoc}" style="font-size: 11px;"/>
+        </p:column>
+            
+            <p:column width="120"  filterBy="#{detalle.factura.cliente.persona}" headerText="Corr" footerText="contains" filterMatchMode="contains">
+            <f:facet name="header">
+                <h:outputText value="Cliente" />
+            </f:facet>
+                <h:outputText value="#{detalle.factura.cliente.persona.nombresociedad} #{detalle.factura.cliente.persona.primernombre} #{detalle.factura.cliente.persona.segundonombre} #{detalle.factura.cliente.persona.primerapellido} #{detalle.factura.cliente.persona.segundoapellido}"/>
         </p:column>
         
-        <p:column width="40"  filterBy="#{detalle.factura.correlativo}" headerText="Corr" footerText="contains" filterMatchMode="contains">
+        <p:column width="35"  filterBy="#{detalle.factura.correlativo}" headerText="Corr" footerText="contains" filterMatchMode="contains">
             <f:facet name="header">
                 <h:outputText value="Corr" />
             </f:facet>
                 <h:outputText value="#{detalle.factura.correlativo}"/>
         </p:column>
             
-        <p:column width="60">
+        <p:column width="30">
             <f:facet name="header"> 
-                <h:outputText value="Cantidad" />
+                <h:outputText value="Cant." />
             </f:facet>
             <h:outputText value="#{detalle.cantidad}" >
-                <f:convertNumber type="number" pattern="$ 0.00"/>
+                <f:convertNumber type="number" pattern="0.00"/>
             </h:outputText>
         </p:column>
             
-        <p:column width="105">
+        <p:column width="105" style="font-size: 12px;">
             <f:facet name="header"> 
                 <h:outputText value="Concepto" />
             </f:facet>
@@ -103,7 +110,7 @@
             </h:outputText>
         </p:column>
         
-        <p:column width="60">
+        <p:column width="50" style="font-size: 12px;">
             <f:facet name="header">
                 <h:outputText value="Valor No Sujeto" />
             </f:facet>
@@ -112,28 +119,28 @@
             </h:outputText>
         </p:column> 
         
-        <p:column width="50" filterBy="#{detalle.numequipo}" headerText="Num. Equipo" footerText="contains" filterMatchMode="contains" >   
+        <p:column width="35" filterBy="#{detalle.numequipo}" headerText="Num. Equipo" footerText="contains" filterMatchMode="contains" style="font-size: 11px;" >   
             <f:facet name="header">
-              <h:outputText value="Num.Eq" />
+              <h:outputText value="#EQ" />
             </f:facet>
               <h:outputText value="#{detalle.numequipo}" />
         </p:column>
                         
-        <p:column filterBy="#{detalle.placa}" headerText="Placa" footerText="contains" filterMatchMode="contains">
+            <p:column filterBy="#{detalle.placa}" headerText="Placa" footerText="contains" filterMatchMode="contains" style="font-size: 12px;" width="50">
             <f:facet name="header">
                 <h:outputText value="Placa" />
             </f:facet>
             <h:outputText value="#{detalle.placa}" />
         </p:column>
                         
-        <p:column filterBy="#{detalle.vehiculomodelo.marcavehiculo.nombremarca}" headerText="Marca" footerText="contains" filterMatchMode="contains">
+        <p:column filterBy="#{detalle.vehiculomodelo.marcavehiculo.nombremarca}" headerText="Marca" footerText="contains" filterMatchMode="contains" style="font-size: 11px;">
             <f:facet name="header">
                 <h:outputText value="Marca" />
             </f:facet>
             <h:outputText value="#{detalle.vehiculomodelo.marcavehiculo.nombremarca}" />
         </p:column>
                         
-        <p:column filterBy="#{detalle.vehiculomodelo.nombremodelo}" headerText="Modelo" footerText="contains" filterMatchMode="contains">
+        <p:column filterBy="#{detalle.vehiculomodelo.nombremodelo}" headerText="Modelo" footerText="contains" filterMatchMode="contains" style="font-size: 11px;">
             <f:facet name="header">
                 <h:outputText value="Modelo" />
             </f:facet>

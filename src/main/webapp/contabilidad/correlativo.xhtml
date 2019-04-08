@@ -13,7 +13,7 @@
                 <h:form id="ingresocorr">
                     <h:panelGrid columns="2">
                         <h:outputText value="Tipo de Documento"/>
-                        <p:selectOneMenu id="tipodoc" value="#{correlativoController.tipodocumento.id}">
+                        <p:selectOneMenu id="tipodoc" value="#{correlativoController.tipodocumento.id}" required="true">
                             <f:selectItem itemLabel="Seleccione tipo Doc" />
                             <f:selectItems value="#{correlativoController.tiposdoc}" var="doc" itemLabel="#{doc.nombredoc}" itemValue="#{doc.id}"  />
                         </p:selectOneMenu>
@@ -38,26 +38,28 @@
                                 Correlativos
                             </f:facet>
                  
-                            
-                            <p:column headerText="NUM RESOLUCION" width="300">
+                            <p:column headerText="TIPO DOC" width="300">
+                                <h:outputText value="#{corr.tipodocumento.nombredoc}"></h:outputText>                        
+                            </p:column>
+                            <p:column headerText="NUM RESOLUCION" width="200">
                                 <h:outputText value="#{corr.nresolucion}"></h:outputText>                        
                             </p:column>
                             <p:column headerText="FECHA AUTORIZACION" width="100">
                                 <h:outputText value="#{corr.fautorizacion}"><f:convertDateTime type="date" pattern="dd-MM-yyyy"/></h:outputText>
                             </p:column>
-                            <p:column headerText="DEL">
+                            <p:column headerText="DEL" width="130">
                                 <h:outputText value="#{corr.serieautini}" />                           
                             </p:column>
-                            <p:column headerText="AL">
+                            <p:column headerText="AL" width="130">
                                 <h:outputText value="#{corr.serieautfin}"></h:outputText>
                             </p:column>
-                             <p:column headerText="CORR INICIO">
+                            <p:column headerText="CORR INICIO" width="50">
                                  <h:outputText value="#{corr.cinicial}"></h:outputText>
                             </p:column>
-                            <p:column headerText="CORR FIN">
+                            <p:column headerText="CORR FIN" width="40">
                                 <h:outputText value="#{corr.cfinal}"></h:outputText>
                             </p:column>
-                            <p:column headerText="ESTADO">
+                            <p:column headerText="ESTADO" width="50">
                                 <h:outputText value="#{corr.estado}"></h:outputText>     
                             </p:column>
                             <p:column style="width:32px">

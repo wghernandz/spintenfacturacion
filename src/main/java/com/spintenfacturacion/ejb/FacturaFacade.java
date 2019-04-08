@@ -120,7 +120,7 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       List<Factura> lista = null;
       try{
         String consulta;
-        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.correlativodoc.tipodocumento.id,f.fecha,f.correlativo";
+        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.correlativo,f.fecha,f.correlativodoc.tipodocumento.id ASC";
         Query query=em.createQuery(consulta);
         query.setParameter(1,fini,TemporalType.DATE);
         query.setParameter(2,ffin,TemporalType.DATE);
@@ -132,5 +132,75 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       return lista;
     } 
     
+    /*select * from factura f,correlativodoc corr,tipodocumento t 
+        where f.idcorrelativo=corr.id and corr.iddoc=t.id and (t.codigo='CCF' or t.codigo='FCF') and t.IDSUCURSAL=2*/
     
+      //obtener listado de acuerdo a sucursal.
+    @Override
+    public List<Factura> facturaSucursal(int idsucursal){
+       
+      System.out.println("SUCURSAL "+idsucursal);
+      List<Factura> lista = null;
+      //try{
+        String consulta;
+        consulta="SELECT f FROM Factura f,correlativoDoc corr,tipoDocumento t WHERE f.correlativodoc.id=corr.id AND"
+                + " corr.tipodocumento.id=t.id AND (t.codigo='CCF' or t.codigo='FCF') and t.idsucursal = ?1";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,idsucursal);
+        
+        lista = query.getResultList();
+      //}catch (Exception e){
+       //System.out.println(e.getMessage());
+      //}
+      return lista;
+    }
+    
+     //DETERMINAR SI UNA FACTURA TIENE NC OR ND.
+    @Override
+    public Factura facturaConncnd(int idfact){
+      Factura factura = null;
+      List<Factura> lista=null;
+      try{
+        String consulta;
+        consulta="SELECT f FROM Factura f WHERE f.idccfajustado = ?1  ";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1, idfact);
+        
+        lista = query.getResultList();
+        factura=(Factura)lista.get(0);
+
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return factura;
+    }
+    
+    @Override
+    public boolean existeCorr(correlativoDoc corr,int corrabuscar){
+        boolean existe=false;
+        int idcorr=corr.getId();
+        Factura factura=null;
+        List<Factura> lista=null;
+        try{
+            String consulta;
+            consulta="SELECT f FROM Factura f,correlativoDoc c WHERE f.correlativodoc.id=c.id AND f.correlativodoc.id = ?1 AND f.correlativo = ?2 ";
+            Query query=em.createQuery(consulta);
+            query.setParameter(1,idcorr);
+            query.setParameter(2,corrabuscar);
+            
+            lista=query.getResultList();
+            
+            System.out.println("VALOR CORR"+lista.get(0).getCorrelativo());
+            
+            if(lista.isEmpty()==true){
+                existe=false;
+            }else{
+                existe=true;
+            }         
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        
+        return existe;
+    }
 }

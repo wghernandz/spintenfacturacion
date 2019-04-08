@@ -2,6 +2,7 @@ com\spintenfacturacion\model\Municipio_.class
 com\spintenfacturacion\model\Persona_.class
 com\spintenfacturacion\ejb\ProductoFacade.class
 com\spintenfacturacion\ejb\marcaVehiculoFacadeLocal.class
+com\spintenfacturacion\controller\plantillabaseController.class
 com\spintenfacturacion\ejb\MunicipioFacade.class
 com\spintenfacturacion\ejb\DepartamentoFacade.class
 com\spintenfacturacion\model\vehiculoModelo.class
@@ -29,6 +30,7 @@ com\spintenfacturacion\model\marcaVehiculo.class
 com\spintenfacturacion\model\Usuario_.class
 com\spintenfacturacion\model\tipoDocumento.class
 com\spintenfacturacion\utileria\restarAnio.class
+com\spintenfacturacion\utileria\desactivarControles.class
 com\spintenfacturacion\ejb\ClienteFacade.class
 com\spintenfacturacion\model\correlativoDoc_.class
 com\spintenfacturacion\model\Departamento_.class
@@ -58,6 +60,7 @@ com\spintenfacturacion\controller\detalleController.class
 com\spintenfacturacion\model\Producto_.class
 com\spintenfacturacion\model\usuarioRole.class
 com\spintenfacturacion\ejb\detalleFacturaFacade.class
+com\spintenfacturacion\utileria\ToUpperCaseConverter.class
 com\spintenfacturacion\controller\clienteController.class
 com\spintenfacturacion\ejb\FacturaFacadeLocal.class
 com\spintenfacturacion\model\Municipio.class

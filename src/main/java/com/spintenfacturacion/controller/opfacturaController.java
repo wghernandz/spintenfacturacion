@@ -137,4 +137,36 @@ public class opfacturaController implements Serializable {
         return formatter.format(date);
     }
     
+    public String ncnd(int idfact){
+
+        Factura fact;
+        fact=facturaEJB.find(idfact);
+        String sucursal;
+
+        if(fact.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){
+            sucursal="Servirad";
+        }else{
+            sucursal="Servipint";
+        }
+        return  sucursal+" "+fact.getCorrelativodoc().getTipodocumento().getCodigo()+" "+fact.getCorrelativo();
+    }
+    
+    
+     public String factNCND(int idfact){
+        Factura fact;
+        fact=facturaEJB.facturaConncnd(idfact);
+        String sucursal;
+        if (fact!=null){
+            if(fact.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){
+                sucursal="Servirad";
+            }else{
+                sucursal="Servipint";
+            }
+            return  sucursal+" "+fact.getCorrelativodoc().getTipodocumento().getCodigo()+" "+fact.getCorrelativo();
+        }else{
+            return "";
+        }
+        
+    }
+     
 }

@@ -259,11 +259,15 @@ public class clienteController implements Serializable {
             this.setPersona(this.cliente.getPersona());
             this.tipoempresa="Natural";
             this.natural=false;
+            //bloquear datos de juridica
+            this.juridica=true;
         }else{
             this.setPersona(this.cliente.getPersona());
             this.setCliente(this.cliente);
             this.tipoempresa="Juridica";
             this.juridica=false;
+            //bloquear datos de natural
+            this.natural=true;
         }
         
         this.guardar=true;
@@ -327,5 +331,9 @@ public class clienteController implements Serializable {
         
             UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
             return view.getViewId() + "?faces-redirect=true&includeViewParams=true"; 
+    }
+    
+    public void municipioXdepartamento(){
+        this.municipios=departamentoEJB.deptoXmunicipio(this.departamento);
     }
 }

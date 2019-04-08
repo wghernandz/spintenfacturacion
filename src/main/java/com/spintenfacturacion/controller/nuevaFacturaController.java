@@ -22,10 +22,12 @@ import com.spintenfacturacion.model.Factura;
 import com.spintenfacturacion.model.Municipio;
 import com.spintenfacturacion.model.Persona;
 import com.spintenfacturacion.model.Producto;
+import com.spintenfacturacion.model.Usuario;
 import com.spintenfacturacion.model.correlativoDoc;
 import com.spintenfacturacion.model.detalleFactura;
 import com.spintenfacturacion.model.marcaVehiculo;
 import com.spintenfacturacion.model.tipoDocumento;
+import com.spintenfacturacion.model.usuarioRole;
 import com.spintenfacturacion.model.vehiculoModelo;
 import com.spintenfacturacion.utileria.NumeroLetras;
 //import java.awt.Event;
@@ -53,6 +55,11 @@ import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import javax.faces.event.ActionEvent;
 import org.primefaces.context.RequestContext;
+import com.spintenfacturacion.utileria.desactivarControles;
+import java.math.MathContext;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 @Named
@@ -84,6 +91,7 @@ public class nuevaFacturaController implements Serializable {
     
     //ENTIDADES
     private Factura factura;
+    private Factura facturaaaplicar;
     private Factura facturaaimprimir;
     private detalleFactura detallefactura;
     private vehiculoModelo vehiculomodelo;
@@ -94,9 +102,10 @@ public class nuevaFacturaController implements Serializable {
     private Cliente cliente;
     private marcaVehiculo marcavehiculo;
     private Producto producto;
-    private Persona persona;
+    private Usuario usuario;
     private vehiculoModelo vehiculomodelodet;
     private marcaVehiculo marcavehiculodet;
+    private usuarioRole role;
     
     //Listas
     private List<detalleFactura> detallesfactura;
@@ -111,6 +120,8 @@ public class nuevaFacturaController implements Serializable {
     private List<Producto> productos;
     private List<vehiculoModelo> vehiculosmodelodet;
     private List<marcaVehiculo> marcasdet;
+    private List<Factura> facturas;
+    private List<Factura> facturasFiltered;
     
     private BigDecimal acumulatorVentans= new BigDecimal(0);
     private BigDecimal acumulatorVentaex= new BigDecimal(0);
@@ -127,17 +138,27 @@ public class nuevaFacturaController implements Serializable {
     private boolean guardarcambios;
     private boolean imprimir;
     private boolean enmodificacion;
+    private boolean corrautorizadomh;
+    
+    //para desactivar opciones nota de credito o debito
+    private boolean datonotacredito;
     
     private int tipoventa=0;
     
     @PostConstruct
     public void init(){
+        //obtener rol y usuario en session
+        FacesContext context = FacesContext.getCurrentInstance();
+        this.role= (usuarioRole) context.getExternalContext().getSessionMap().get("mirol");
+        this.role.getRole().getNombrerole();
+        this.usuario=(Usuario) context.getExternalContext().getSessionMap().get("usuarioactivo");
         //SI HAY FACTURA EN PROCESO SE DEBE INICIALIZAR FACTURA A IMPRIMIR.PENDIENTE
         //verificar si hay una factura en proceso.
-        if(facturaEJB.facturaEnproceso()!=null){
+        if((facturaEJB.facturaEnproceso()!=null) && (this.usuario.getUsername().equals(facturaEJB.facturaEnproceso().getUsuario().getUsername()))){
             factura=facturaEJB.facturaEnproceso();
+            facturaaimprimir=factura;
             detallesfactura=detallefacturaEJB.detalleDeFactura(factura.getId());
-            persona=factura.getPersona();
+            usuario=factura.getUsuario();
             cliente=factura.getCliente();
             correlativodoc=factura.getCorrelativodoc();
             tipodocumento=correlativodoc.getTipodocumento();
@@ -149,13 +170,22 @@ public class nuevaFacturaController implements Serializable {
                 marcavehiculo=new marcaVehiculo(); 
             }
             if(detallefacturaEJB.detalleDeFactura(factura.getId()).isEmpty()){
-                //inicializar acumuladores
-                //System.out.println("INICIALIZANDO ACUM");
                 this.factura.setAcumventaex(new BigDecimal(0));
                 this.factura.setAcumventagra(new BigDecimal(0));
                 this.factura.setAcumventans(new BigDecimal(0));
+            }else{
+                this.iva=this.factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP);
+                //SI ES CCF
+                this.subtotal=this.factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2,RoundingMode.HALF_UP);
             }
+            
                 this.modificarencabezado=true;
+                
+            //verificar si es nota de credito o debito
+            int tipodocid=factura.getCorrelativodoc().getTipodocumento().getId();
+            if(tipodocid==7||tipodocid==8||tipodocid==9||tipodocid==10){
+                this.datonotacredito=false;
+            }
         }else{
             factura=new Factura();
             vehiculomodelo= new vehiculoModelo();
@@ -163,7 +193,7 @@ public class nuevaFacturaController implements Serializable {
             tipodocumento= new tipoDocumento();
             correlativodoc= new correlativoDoc();
             cliente= new Cliente();
-            persona= new Persona();
+            usuario= new Usuario();
             //Inicializar acumuladores
             this.factura.setAcumventaex(new BigDecimal(0));
             this.factura.setAcumventagra(new BigDecimal(0));
@@ -172,13 +202,27 @@ public class nuevaFacturaController implements Serializable {
         marcavehiculodet=new marcaVehiculo();
         vehiculomodelodet= new vehiculoModelo();
         detallefactura= new detalleFactura();
+        detallefactura.setCantidad(new BigDecimal(1));
         departamento= new Departamento();
         municipio= new Municipio();
         producto= new Producto();
         vehiculosmodelodet=vehiculomodeloEJB.findAll();
         marcasdet=marcavehiculoEJB.findAll();
         vehiculosmodelo=vehiculomodeloEJB.findAll();
-        tiposdocumento=tipodocumentoEJB.findAll();
+        //mostrar documento de acuerdo a tipo de usuario
+        
+        if(this.role.getRole().getId()==2){
+            tiposdocumento=tipodocumentoEJB.findAll();
+            
+            }else if(this.role.getRole().getId()==3){
+                    tiposdocumento=tipodocumentoEJB.findAll();
+            
+                }else if(this.role.getRole().getId()==4){
+                    tiposdocumento=tipodocumentoEJB.userServi();
+                    }else{
+                        tiposdocumento=tipodocumentoEJB.docXsucursal(2);
+                    }
+        //tiposdocumento=tipodocumentoEJB.findAll();
         departamentos=departamentoEJB.findAll();
         municipios=municipioEJB.findAll();
         marcas=marcavehiculoEJB.findAll();
@@ -186,6 +230,8 @@ public class nuevaFacturaController implements Serializable {
         clientes=clienteEJB.findAll();
         tipoventa=0;
         modificar=true;
+        datonotacredito=true;
+        facturaaaplicar=new Factura();
     }
 
     public FacturaFacadeLocal getFacturaEJB() {
@@ -356,12 +402,12 @@ public class nuevaFacturaController implements Serializable {
         this.producto = producto;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public List<detalleFactura> getDetallesfactura() {
@@ -599,13 +645,79 @@ public class nuevaFacturaController implements Serializable {
     public void setMarcavehiculodet(marcaVehiculo marcavehiculodet) {
         this.marcavehiculodet = marcavehiculodet;
     }
+
+    public boolean isDatonotacredito() {
+        return datonotacredito;
+    }
+
+    public void setDatonotacredito(boolean datonotacredito) {
+        this.datonotacredito = datonotacredito;
+    }
+
+    public List<Factura> getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
+    }
+
+    public List<Factura> getFacturasFiltered() {
+        return facturasFiltered;
+    }
+
+    public void setFacturasFiltered(List<Factura> facturasFiltered) {
+        this.facturasFiltered = facturasFiltered;
+    }
+
+    public Factura getFacturaaaplicar() {
+        return facturaaaplicar;
+    }
+
+    public usuarioRole getRole() {
+        return role;
+    }
+
+    public void setRole(usuarioRole role) {
+        this.role = role;
+    }
+
+    public boolean isCorrautorizadomh() {
+        return corrautorizadomh;
+    }
+
+    public void setCorrautorizadomh(boolean corrautorizadomh) {
+        this.corrautorizadomh = corrautorizadomh;
+    }
+
+    public void setFacturaaaplicar(Factura facturaaaplicar) {
+        this.facturaaaplicar = facturaaaplicar;
+    }
+    
     //establecer el correlativo a utilizar en la facturacion
-    public void obtenerUltimocorr(){
+ /*   public void obtenerUltimocorr(){
         int correlativo=facturaEJB.obtenerUltimocorr(this.tipodocumento.getId());
+        //this.correlativodoc=correlativodocEJB.;
+        
         //BigDecimal correlativo=new BigDecimal(corr);
+        this.correlativodoc=correlativodocEJB.corrdocTipoDoc(this.tipodocumento.getId());
+        if (this.correlativodoc!=null){
+                correlativo=correlativodocEJB.find(this.correlativodoc.getId()).getUltimo();
+                correlativo=correlativo+1;
+                factura.setCorrelativo(correlativo);
+        }else{
+              FacesContext.getCurrentInstance().addMessage(
+                        null, new FacesMessage("NO HAY CORRELATIVO AUTORIZADO POR MINISTERIO DE HACIENDA"));
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getFlash().setKeepMessages(true);
+                factura.setCorrelativo(0);
+        
+        }
+        
         switch (correlativo){
             case 0://existe correlativo pero aun no se a utilizado
-                int cinicial=correlativodocEJB.obtenerCorrInicial(this.tipodocumento.getId());//obtener correlativoinicial
+                int cinicial=correlativodocEJB.obtenerCorrInicial(this.tipodocumento.getId());//obtener correlativoinicial 0
                 if(cinicial!=-1){
                     if(cinicial!=1){
                         factura.setCorrelativo(cinicial);
@@ -634,7 +746,23 @@ public class nuevaFacturaController implements Serializable {
                 factura.setCorrelativo(correlativo);
                 break;
         }
+        //verificar si es nota de credito o debito y desactivar controlador
+        int idtipodoc=this.tipodocumento.getId();
+        if(idtipodoc==7 || idtipodoc==8 || idtipodoc==9 || idtipodoc==10){
+            datonotacredito=false;
+        }else{
+             datonotacredito=true;
+        } 
+         FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("nuevo:ccfajusteb");
+         FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("nuevo:ccfajuste");
+    }*/
+    
+      //ESTABLECER CORRELATIVODOC AL SELECCIONAR TIPO DE DOCUMENTO
+    public void setCorractual(){
+        this.correlativodoc=correlativodocEJB.corrdocTipoDoc(this.tipodocumento.getId());
+        this.factura.setCorrelativo(0);
     }
+    
         public void obtenerDatosCliente(){
             this.cliente=clienteEJB.clienteSegunnrc(cliente.getNrc());
             this.municipio=municipioEJB.find(this.cliente.getPersona().getMunicipio().getId());
@@ -647,26 +775,39 @@ public class nuevaFacturaController implements Serializable {
             if(this.tipoventa==0){ 
                 //Verificar si es factura consumidor final, si es asi, modificar calculos  
                 if(!"FCF".equals(tipodoc)){
-                    System.out.println("AQUI"+this.tipodocumento.getCodigo());
                     //cuando no es factura consumidor final el acumuladorVentagra posee valor neto
                     this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//establecer valores netos
                     //this.acumulatorVentagra=this.acumulatorVentagra.add(this.detallefactura.getVneto());//acumular suma valor neto y mostrar
                     
                     this.factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto()));
-                    System.out.println("VALOR ACUMGRA"+this.factura.getAcumventagra());
-                    //this.setIva(this.acumulatorVentagra.multiply(new BigDecimal("0.13")));
-                    this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")));
-                    this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
-                    this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")));
+                    this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
+                        //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2, RoundingMode.HALF_UP));
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }
+                    this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_UP));
                     }else{
                         //cuando es factura consumidor final el acumuladorVentagra tiene un valor total, se debe obtener el valor neto para guardarlo
                         this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//es vtotal
-                        this.vafectafactura=this.vafectafactura.add(this.detallefactura.getVneto());//solo para efecto de mostrar
                         //this.acumulatorVentagra=this.acumulatorVentagra.add(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP));//acumular suma valor neto y mostrar
                         factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP)));
-                        this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")));
-                        this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
-                        this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).subtract(this.factura.getRetencion()));
+                        this.vafectafactura=factura.getAcumventagra().multiply(new BigDecimal("1.13"));//solo para efecto de mostrar
+                        
+                        this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
+                             //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2,RoundingMode.HALF_UP));
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }
+                        //Establecer subtotal de acuerdo si es factura servipinten o serviradiadores
+                        if(factura.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){//serviradiadores
+                            this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).subtract(this.factura.getRetencion()));
+                        }else{//servipinten
+                            this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).add(factura.getAcumventaex()));
+                        }
                      }
                 this.detallefactura.setVexento(new BigDecimal(0));
                 this.detallefactura.setVnogravado(new BigDecimal(0));
@@ -689,10 +830,17 @@ public class nuevaFacturaController implements Serializable {
             
             //obtener sumatoria total, cuando sea factura y cuando sea CCF or NC or ND
             if(!"FCF".equals(tipodoc)){
-                System.out.println("VALOR SUBTOTAL"+subtotal);
+                System.out.println("VALOR NETO"+this.factura.getAcumventagra());
+                System.out.println("IVA"+this.iva);
+                System.out.println("VALOR SUBTOTAL"+this.subtotal);
+                System.out.println("RETENCION"+this.factura.getRetencion());               
                 this.factura.setTotalventa(this.subtotal.subtract(this.factura.getRetencion()).add(factura.getAcumventaex()).add(factura.getAcumventans()));
                 }else{
-                   this.factura.setTotalventa(this.subtotal.add(factura.getAcumventaex()).add(factura.getAcumventans()));
+                   if(factura.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){//serviradiadores
+                       this.factura.setTotalventa(this.subtotal.add(factura.getAcumventaex()).add(factura.getAcumventans()));
+                   }{
+                         this.factura.setTotalventa(this.subtotal.add(factura.getAcumventaex()).add(factura.getAcumventans()).subtract(this.factura.getRetencion()));
+                    }
                 }
             //Pasar sumatoria total a letras
             this.factura.setTventaenletras(NumeroLetras.cantidadConLetra(this.factura.getTotalventa().toString()));
@@ -706,9 +854,14 @@ public class nuevaFacturaController implements Serializable {
             this.correlativodoc=tipodocumentoEJB.correlativoDocUso(this.tipodocumento.getId());
             //guardar factura operaciones y calculos
             if(facturaEJB.find(factura.getId())==null){
-              this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              //this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              this.usuario= (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuarioactivo");
+              this.factura.setUsuario(this.usuario);
               if(vehiculomodelo.getId()!=0){
                 this.factura.setVehiculomodelo(vehiculomodelo);
+              }
+              if(facturaaaplicar!=null){
+                this.factura.setIdccfajustado(facturaaaplicar.getId());
               }
               this.factura.setCliente(cliente);
               this.factura.setCorrelativodoc(this.correlativodoc);
@@ -755,7 +908,6 @@ public class nuevaFacturaController implements Serializable {
             
             operacionesAgregarModificar();
             if(this.vehiculomodelodet.getId()!=0){
-                System.out.println("Pase aqui"+vehiculomodelodet.getNombremodelo());
                 this.detallefactura.setVehiculomodelo(vehiculomodelodet);
             }else{
                 this.detallefactura.setVehiculomodelo(null);
@@ -844,7 +996,12 @@ public class nuevaFacturaController implements Serializable {
             //verificar tipo de documento
             if(!"FCF".equals(this.detallefactura.getFactura().getCorrelativodoc().getTipodocumento().getCodigo())){
                 this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")));
-                this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
+                     //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) && (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1) ){
+                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }
                 this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")));
                 this.factura.setTotalventa(this.subtotal.subtract(this.factura.getRetencion()).add(factura.getAcumventaex()).add(factura.getAcumventans()));
                 this.factura.setTventaenletras(NumeroLetras.cantidadConLetra(this.factura.getTotalventa().toString()));
@@ -852,7 +1009,12 @@ public class nuevaFacturaController implements Serializable {
             }else{
                 BigDecimal vneto=factura.getAcumventagra();
                 this.setIva(vneto.multiply(new BigDecimal("0.13")));
-                this.factura.setRetencion(vneto.multiply(new BigDecimal("0.01")));
+                     //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy())  &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                            this.factura.setRetencion(vneto.multiply(new BigDecimal("0.01")));
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }
                 this.setSubtotal(vneto.multiply(new BigDecimal("1.13")).subtract(this.factura.getRetencion()));
                 this.factura.setTotalventa(this.subtotal.add(factura.getAcumventaex()).add(factura.getAcumventans()));
                 this.factura.setTventaenletras(NumeroLetras.cantidadConLetra(this.factura.getTotalventa().toString()));
@@ -879,10 +1041,12 @@ public class nuevaFacturaController implements Serializable {
               BigDecimal totalventa=factura.getTotalventa();
               String tventaenletras=factura.getTventaenletras();
               this.factura=facturaEJB.find(factura.getId());
-              this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              //this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              //this.factura.setUsuario(null);
               if(vehiculomodelo.getId()!=0){
                 this.factura.setVehiculomodelo(vehiculomodelo);
               }
+              
               this.factura.setRetencion(retencion);
               this.factura.setTotalventa(totalventa);
               this.factura.setTventaenletras(tventaenletras);
@@ -890,6 +1054,8 @@ public class nuevaFacturaController implements Serializable {
               this.factura.setCorrelativodoc(this.correlativodoc);
               this.factura.setCondpago("cred");
               this.factura.setEstado("Finalizado");
+              System.out.println("FACTURA A APLICAR"+this.facturaaaplicar.getId());
+              this.factura.setIdccfajustado(this.facturaaaplicar.getId());
                 facturaEJB.edit(factura);
                 this.setFacturaaimprimir(factura);
                 cliente= new Cliente();
@@ -903,7 +1069,16 @@ public class nuevaFacturaController implements Serializable {
                 factura.setAcumventans(new BigDecimal(0));
                 this.iva=new BigDecimal(0);
                 this.subtotal=new BigDecimal(0);
-                
+                marcavehiculo=new marcaVehiculo();
+                vehiculomodelo=new vehiculoModelo();
+                //verificar si ya se termino correlativo
+                this.correlativodoc=correlativodocEJB.actEstadoCorr(this.correlativodoc.getId());
+                //incrementar corr.
+                //this.correlativodoc=correlativodocEJB.corrdocTipoDoc(this.tipodocumento.getId());
+                //int nuevocorr=this.correlativodoc.getUltimo()+1;
+                this.factura.setCorrelativo(0);
+                //reiniciar factura a aplicar
+                //facturaaaplicar=new Factura();
         FacesContext.getCurrentInstance().addMessage(
         null, new FacesMessage("FACTURA INGRESADA CON EXITO"));
  
@@ -922,9 +1097,11 @@ public class nuevaFacturaController implements Serializable {
               BigDecimal totalventa=factura.getTotalventa();
               String tventaenletras=factura.getTventaenletras();
               
-              this.setCorrelativodoc(tipodocumentoEJB.correlativoDocUso(this.tipodocumento.getId()));
+              this.setCorrelativodoc(factura.getCorrelativodoc());
+              //this.setCorrelativodoc(tipodocumentoEJB.correlativoDocUso(this.tipodocumento.getId()));
               //this.factura=facturaEJB.find(factura.getId());
-              this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              //this.factura.setPersona(personaEJB.find(cliente.getPersona().getId()));
+              //this.factura.setUsuario(null);
               //if(this.vehiculomodelo.getId()!=0){
               if(vehiculomodelo.getId()==0){
                 this.factura.setVehiculomodelo(null);
@@ -943,7 +1120,14 @@ public class nuevaFacturaController implements Serializable {
                     factura.setAcumventagra(totalventa.add(retencion).divide(new BigDecimal("1.13")));
                     //acumulatorVentagra=totalventa.add(retencion).divide(new BigDecimal("1.13"));
                     this.vafectafactura=factura.getAcumventagra();
-                    this.factura.setRetencion(this.vafectafactura.divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP).multiply(new BigDecimal("0.01")));
+                     //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) && (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                            this.factura.setRetencion(this.vafectafactura.divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP).multiply(new BigDecimal("0.01")));
+                       
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }
+                    
                     this.subtotal=this.vafectafactura.subtract(this.factura.getRetencion());
                     this.factura.setTotalventa(this.subtotal.add(factura.getAcumventaex()).add(factura.getAcumventans()));
                 }
@@ -953,7 +1137,12 @@ public class nuevaFacturaController implements Serializable {
                     this.vafectafactura=new BigDecimal(0);
                     this.iva=factura.getAcumventagra().multiply(new BigDecimal("0.13"));
                     this.subtotal=factura.getAcumventagra().add(iva);
-                    this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
+                        //verificar tipo de contribuyente para efectuar retencion
+                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")));
+                        }else{
+                            this.factura.setRetencion(new BigDecimal("0.00"));
+                        }  
                     this.factura.setTotalventa(this.subtotal.subtract(retencion).add(factura.getAcumventaex()).add(factura.getAcumventans()));
                 }
               }  
@@ -961,8 +1150,7 @@ public class nuevaFacturaController implements Serializable {
               this.modificarencabezado=true;
               this.guardarcambios=false;
               this.agregar=false;
-              this.finalizar=false;
-              
+              this.finalizar=false;    
         }
         
        public void imprimirFactura(ActionEvent actionEvent) throws JRException, IOException{
@@ -982,34 +1170,44 @@ public class nuevaFacturaController implements Serializable {
             //if(null != facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) //serviradiadores
             switch (facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) {
                 case "FCF":
-                    ruta="/reportes/fcf_pinten.jasper";//consumidor final servirad
+                    ruta="/reportes/fcf_servirad.jasper";//consumidor final servirad
                     break;
                 case "CCF":
                     ruta="/reportes/ccf_servirad.jasper";//ccf servirad
                     break;
                 case "NC":
-                    ruta="/reportes/ccf_servirad.jasper";//nota credito servirad
+                    ruta="/reportes/ncnd_servirad.jasper";//nota credito servirad
                     break;
                 default:
-                    ruta="/reportes/ccf_servirad.jasper";//nota debito servirad
+                    ruta="/reportes/ncnd_servirad.jasper";//nota debito servirad//mismo formato de servirad
                     break;
             }
         
         
         }else{
-            //if(null != facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) //servipinten
+            //if(null != facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo())//servipinten
+            FacesContext context = FacesContext.getCurrentInstance();
+            this.role=(usuarioRole) context.getExternalContext().getSessionMap().get("mirol");
             switch (facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) {
                 case "FCF":
-                    ruta="/reportes/fcf_pinten.jasper";//consumidor final servirad
+                    if ("FACTURADOR-SERVIPINT".equals(this.role.getRole().getNombrerole())){
+                        ruta="/reportes/fcf_pinten.jasper";//consumidor final servipinten
+                    }else{
+                        ruta="/reportes/fcf_pinten_servi.jasper";
+                    }
                     break;
                 case "CCF":
-                    ruta="/reportes/ccf_servirad.jasper";//ccf servirad
+                     if ("FACTURADOR-SERVIPINT".equals(this.role.getRole().getNombrerole())){//
+                        ruta="/reportes/ccf_pinten.jasper";}
+                    else{
+                        ruta="/reportes/ccf_pinten_servi.jasper";
+                    }//ccf servipinten}
                     break;
                 case "NC":
-                    ruta="/reportes/ccf_servirad.jasper";//nota credito servirad
+                    ruta="/reportes/nc_pinten.jasper";//nota credito servirad//
                     break;
                 default:
-                    ruta="/reportes/ccf_servirad.jasper";//nota debito servirad
+                    ruta="/reportes/ncnd_servirad.jasper";//pendiente//NO HAY NOTA DE DEBITO SERVIPINTEN SOLO SERVIRAD
                     break;
             }
         }
@@ -1017,9 +1215,17 @@ public class nuevaFacturaController implements Serializable {
         File jasper= new File(FacesContext.getCurrentInstance().getExternalContext().getRealPath(ruta));
         
         //JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(),new HashMap(),new JRBeanCollectionDataSource(elementosComprobantepago,false));
+        //pasar ccf ajustado como parametro.
+        int ccfajuste=0;
+        if (facturaaimprimir.getIdccfajustado()!=0){
+            Factura facturaajuste = facturaEJB.find(facturaaimprimir.getIdccfajustado());
+            ccfajuste=facturaajuste.getCorrelativo();
+            //facturaaaplicar=new Factura();
+        }     
         
         HashMap params = new HashMap();
-        //params.put("detallesfacturaaimprimir",detallesfacturaaimprimir);
+        params.put("ccfajuste",ccfajuste);
+        
         byte[] bytes=JasperRunManager.runReportToPdf(jasper.getPath(),params,new JRBeanCollectionDataSource(detallesfacturaaimprimir,false));
         
         
@@ -1034,6 +1240,15 @@ public class nuevaFacturaController implements Serializable {
             stream.write(bytes,0,bytes.length);
             stream.flush();
         }
+        
+        if ("FINALIZADO".equals(this.correlativodoc.getEstado())){
+                    this.corrautorizadomh=true;
+            }
+        
+        //actualizar ultimo correlativo utilizado
+        this.correlativodoc.setUltimo(facturaaimprimir.getCorrelativo());
+        correlativodocEJB.edit(correlativodoc);
+        
         FacesContext.getCurrentInstance().responseComplete();
         
         }else{
@@ -1069,5 +1284,181 @@ public class nuevaFacturaController implements Serializable {
         this.productos=productoEJB.findAll();
         producto=new Producto();
     }
+    
+    //formatear fecha
+     public String getDateAsString(Date date) {
+        Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+        return formatter.format(date);
+    }
+    
+    //obtener listado de facturas 
+    public void obtenerTodasFacturas(){
+        System.out.println("FACTURA VALOR "+this.factura.getCorrelativo());
+        this.correlativodoc=tipodocumentoEJB.correlativoDocUso(this.tipodocumento.getId());
+        this.factura.setCorrelativodoc(this.correlativodoc);
+        
+        System.out.println("CORRELATIVODOC "+this.factura.getCorrelativodoc());
+        System.out.println("TIPO DOCUMENTO "+this.factura.getCorrelativodoc().getTipodocumento());
+        System.out.println("SUCURSAL "+this.factura.getCorrelativodoc().getTipodocumento().getIdsucursal());
+        this.facturas=facturaEJB.facturaSucursal(this.factura.getCorrelativodoc().getTipodocumento().getIdsucursal());
+        //this.facturas=facturaEJB.findAll();
+    }
+    
+//Verificar que el correlativo a usar no se repita y que este dentro del rango del correlativo   
+    public void verificarCorr(){
+        if(facturaEJB.existeCorr(this.correlativodoc, this.factura.getCorrelativo())==true){
+            this.factura.setCorrelativo(0);
+             FacesContext.getCurrentInstance().addMessage(
+                null, new FacesMessage("YA EXISTE CORRELATIVO!!!"));
+ 
+                FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash().setKeepMessages(true);
+         }else if(this.factura.getCorrelativo()<this.correlativodoc.getCinicial() || this.factura.getCorrelativo()>this.correlativodoc.getCfinal()) {
+                this.factura.setCorrelativo(0);
+             FacesContext.getCurrentInstance().addMessage(
+                null, new FacesMessage("CORRELATIVO FUERA DE RANGO AUTORIZADO!!!"));
+ 
+                FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash().setKeepMessages(true);
+         }else {
+             FacesContext.getCurrentInstance().addMessage(
+                null, new FacesMessage("CORRELATIVO DISPONIBLE!!!"));
+ 
+                FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash().setKeepMessages(true);
+            } 
+    
+    }
+    
+    //vista preliminar antes de finalizar factura
+    
+    public void vistapreviaFactura(ActionEvent actionEvent) throws JRException, IOException{
+
+        detallesfacturaaimprimir=facturaEJB.imprimirDetalle(this.facturaaimprimir.getId());
+        //validar q exista al menos un detalle en la factura
+        if(detallesfacturaaimprimir.isEmpty()==false){
+        
+        //MOSTRAR REPORTE DE ACUERDO A TIPO DE DOCUMENTO
+        String ruta;
+        if(facturaaimprimir.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){
+            //if(null != facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) //serviradiadores
+            switch (facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) {
+                case "FCF":
+                    ruta="/reportes/fcf_servirad.jasper";//consumidor final servirad
+                    break;
+                case "CCF":
+                    ruta="/reportes/ccf_servirad.jasper";//ccf servirad
+                    break;
+                case "NC":
+                    ruta="/reportes/ncnd_servirad.jasper";//nota credito servirad
+                    break;
+                default:
+                    ruta="/reportes/ncnd_servirad.jasper";//nota debito servirad//mismo formato de servirad
+                    break;
+            }
+        
+        
+        }else{
+            FacesContext context = FacesContext.getCurrentInstance();
+            this.role=(usuarioRole) context.getExternalContext().getSessionMap().get("mirol");
+            switch (facturaaimprimir.getCorrelativodoc().getTipodocumento().getCodigo()) {
+                case "FCF":
+                    if ("FACTURADOR-SERVIPINT".equals(this.role.getRole().getNombrerole())){
+                        ruta="/reportes/fcf_pinten.jasper";//consumidor final servipinten
+                    }else{
+                        ruta="/reportes/fcf_pinten_servi.jasper";
+                    }
+                    break;
+                case "CCF":
+                    if ("FACTURADOR-SERVIPINT".equals(this.role.getRole().getNombrerole())){//
+                        ruta="/reportes/ccf_pinten.jasper";}
+                    else{
+                        ruta="/reportes/ccf_pinten_servi.jasper";
+                    }//ccf servipinten}
+                    break;
+                case "NC":
+                    ruta="/reportes/nc_pinten.jasper";//nota credito servirad//
+                    break;
+                default:
+                    ruta="/reportes/ncnd_servirad.jasper";//pendiente//NO HAY NOTA DE DEBITO SERVIPINTEN SOLO SERVIRAD
+                    break;
+            }
+        }
+        
+        File jasper= new File(FacesContext.getCurrentInstance().getExternalContext().getRealPath(ruta));
+  
+        int ccfajuste=0;
+        if (facturaaimprimir.getIdccfajustado()!=0){
+            Factura facturaajuste = facturaEJB.find(facturaaimprimir.getIdccfajustado());
+            ccfajuste=facturaajuste.getCorrelativo();
+        }     
+        
+        HashMap params = new HashMap();
+        params.put("ccfajuste",ccfajuste);
+        
+        byte[] bytes=JasperRunManager.runReportToPdf(jasper.getPath(),params,new JRBeanCollectionDataSource(detallesfacturaaimprimir,false));
+        
+        
+        HttpServletResponse response=(HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        response.setContentType("application/pdf");
+        response.setContentLength(bytes.length);
+        
+        try (ServletOutputStream stream = response.getOutputStream()) {
+            stream.write(bytes,0,bytes.length);
+            stream.flush();
+        }
+        
+        //actualizar  ultimo correlativo utilizado
+        this.correlativodoc.setUltimo(facturaaimprimir.getCorrelativo());
+        correlativodocEJB.edit(correlativodoc);
+        
+        FacesContext.getCurrentInstance().responseComplete();
+        
+        }else{
+                FacesContext.getCurrentInstance().addMessage(
+                null, new FacesMessage("NO SE PUEDE IMPRIMIR FACTURA SIN ITEMS!!!"));
+ 
+                FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash().setKeepMessages(true);
+        } 
+        
+    }
+    
+    
+      //verificar si existe un correlativo autorizado por hacienda
+    public void corrAutorizado(){
+        
+        //BigDecimal correlativo=new BigDecimal(corr);
+        this.correlativodoc=correlativodocEJB.corrdocTipoDoc(this.tipodocumento.getId());
+        if (this.correlativodoc!=null){
+                 FacesContext.getCurrentInstance().addMessage(
+                        null, new FacesMessage("CORRELATIVO AUTORIZADO"));
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getFlash().setKeepMessages(true);
+                        this.setCorrautorizadomh(false);
+        }else{
+              FacesContext.getCurrentInstance().addMessage(
+                        null, new FacesMessage("NO HAY CORRELATIVO AUTORIZADO POR MINISTERIO DE HACIENDA"));
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getFlash().setKeepMessages(true);
+                        this.setCorrautorizadomh(true);
+        }
+        //verificar si es nota de credito o debito y desactivar controlador
+        int idtipodoc=this.tipodocumento.getId();
+        if(idtipodoc==7 || idtipodoc==8 || idtipodoc==9 || idtipodoc==10){
+            datonotacredito=false;
+        }else{
+             datonotacredito=true;
+        } 
+         FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("nuevo:ccfajusteb");
+         FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("nuevo:ccfajuste");
+    }
+    
+    
 }
-//
