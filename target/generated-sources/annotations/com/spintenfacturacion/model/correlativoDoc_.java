@@ -6,7 +6,7 @@ import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2019-04-05T08:21:39")
+@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2019-05-22T12:00:58")
 @StaticMetamodel(correlativoDoc.class)
 public class correlativoDoc_ { 
 
@@ -19,6 +19,7 @@ public class correlativoDoc_ {
     public static volatile SingularAttribute<correlativoDoc, String> serieautfin;
     public static volatile SingularAttribute<correlativoDoc, Date> fautorizacion;
     public static volatile SingularAttribute<correlativoDoc, String> nresolucion;
+    public static volatile SingularAttribute<correlativoDoc, Integer> iniciaren;
     public static volatile SingularAttribute<correlativoDoc, Integer> cinicial;
 
 }

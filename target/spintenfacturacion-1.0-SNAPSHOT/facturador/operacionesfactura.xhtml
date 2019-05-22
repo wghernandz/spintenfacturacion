@@ -6,8 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-
-    <body>
+<body>
         
 <ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
 
@@ -17,7 +16,7 @@
     <p:dataTable id="tbl" var="factura" value="#{opfacturaController.facturas}"
                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
                  paginator="true" rows="20" style="margin-bottom:20px" widgetVar="opfactura" 
-                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{opfacturaController.facturasFiltered}" sortBy="#{factura.correlativo}" sortOrder="descending">
+                 emptyMessage="No Operaciones found with given criteria" filteredValue="#{opfacturaController.facturasFiltered}">
  
         <f:facet name="{Exporters}">
             <h:commandLink>
@@ -140,12 +139,12 @@
             <f:facet name="header">
                 <h:outputText value="NOTA CREDITO" />
             </f:facet>
-            <h:outputText value="#{factura.idccfajustado!=0 ? opfacturaController.ncnd(factura.idccfajustado): opfacturaController.factNCND(factura.id)}" />
-        </p:column>
+            <h:outputText value="#{factura.ncnd!=null ? opfacturaController.ncnd(factura.ncnd.id): opfacturaController.factNCND(factura.id)}" />
+        </p:column>    
+   </p:dataTable>
         
-   </p:dataTable>    
    </h:form>  
-        <p:dialog header="ANULAR/DESANULAR" id="anul" widgetVar="dlganular" showEffect="explode" hideEffect="bounce" height="125" width="800" dynamic="true">
+        <p:dialog header="ANULAR/DESANULAR" id="anul" widgetVar="dlganular" showEffect="explode" hideEffect="bounce" height="150" width="800" dynamic="true">
             <h:form id="form5">
                 <p:growl id="mismsg" />
                 <h:panelGrid columns="4">
@@ -153,11 +152,15 @@
                     <p:inputText value="#{opfacturaController.factura.correlativodoc.tipodocumento.nombredoc}" disabled="true" style="width: 300px;"/>
                     <h:outputText value="Numero de Documento"/>
                     <p:inputText value="#{opfacturaController.factura.correlativo}" disabled="true"/>
+                    <h:outputText value="Num.Resolucion Correlativo"/>
+                    <p:inputText value="#{opfacturaController.factura.correlativodoc.nresolucion}" disabled="true"/>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
                     <h:outputText value="Razon de anulacion" />
                     <p:inputText value="#{opfacturaController.factura.razanula}" style="width: 300px;" required="true" requiredMessage="Falta razon de anulacion" disabled="#{opfacturaController.estado=='Anulada'}"/>
                     <p:commandButton id="botonanular" value="ANULAR" action="#{opfacturaController.anularFactura()}" update=":opfact" rendered="#{opfacturaController.estado=='Finalizado'}" onsuccess=":mismsg" />
                     <p:commandButton id="botondesanular" value="DESANULAR" action="#{opfacturaController.desanularFactura()}" update=":opfact" rendered="#{opfacturaController.estado=='Anulada'}" onsuccess=":mismsg" />
-                    <p:commandButton value="CANCELAR" onclick="dlganular.hide();" immediate="true" />
+                    <p:commandButton value="CANCELAR" onclick="dlganular.hide();" immediate="true" /> 
                 </h:panelGrid>
             </h:form>
         </p:dialog>     

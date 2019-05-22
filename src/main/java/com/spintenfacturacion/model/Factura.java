@@ -8,6 +8,7 @@ package com.spintenfacturacion.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -70,8 +71,9 @@ public class Factura implements Serializable {
     private BigDecimal acumventagra;
     @Column(name="razanula")
     private String razanula;
-    @Column(name="idccfajustado")
-    private int idccfajustado;
+    @ManyToOne
+    @JoinColumn(name="idccfajustado")
+    private Factura ncnd;
     
     public int getId() {
         return id;
@@ -225,12 +227,12 @@ public class Factura implements Serializable {
         this.razanula = razanula;
     }
 
-    public int getIdccfajustado() {
-        return idccfajustado;
+    public Factura getNcnd() {
+        return ncnd;
     }
 
-    public void setIdccfajustado(int idccfajustado) {
-        this.idccfajustado = idccfajustado;
+    public void setNcnd(Factura ncnd) {
+        this.ncnd = ncnd;
     }
     
 }

@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,7 +25,7 @@ public class detalleFactura implements Serializable {
     @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="SEQ_ID_DETALLEFACTURA")
     @SequenceGenerator(name="SEQ_ID_DETALLEFACTURA",sequenceName="seq_iddetallefactura", allocationSize=1)
     private int id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name="idproducto")
     private Producto producto;
     @ManyToOne
@@ -122,5 +121,6 @@ public class detalleFactura implements Serializable {
 
     public void setPreciounitario(BigDecimal preciounitario) {
         this.preciounitario = preciounitario;
-    }   
+    }
+    
 }

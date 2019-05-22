@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+     
+
+    <body>
+
+        <ui:composition template="./../WEB-INF/templates/facturacionbase.xhtml">
+
+            <ui:define name="content">
+              
+                <h:form id="sconcepto">
+                    <h:panelGrid columns="3" cellpadding="3">
+                        <h:outputText value="De un nombre a la Plantilla"/>
+                        <p:inputText value="#{plantillaDetalleController.plantilla.nombreplantilla}"/>
+                        <p:commandButton value="GUARDAR" action="#{plantillaDetalleController.guardarNombreplantilla()}" update="fmplantillas,sconcepto"/>
+                    </h:panelGrid>
+                </h:form>
+                   <h:form id="fmplantillas">
+                       <p:dataTable id="plant" style="width: 500px;" var="p" value="#{plantillaDetalleController.plantillas}">
+                           <p:column width="100" headerText="NOMBRE PLANTILLA">
+                                <f:facet name="nombre">
+                                <h:outputText value="NOMBRE PLANTILLA"/>
+                                </f:facet>
+                               <p:commandLink action="#{plantillaDetalleController.setPlantilla(p)}" update="agregardet,fmdetplantilla" >
+                                <h:outputText value="#{p.nombreplantilla}"/>
+                               </p:commandLink>
+                            </p:column>
+                            <p:column width="100" headerText="ELIMINAR">
+                                <f:facet name="eliminar">
+                                    <h:outputText value="eliminar"/>
+                                </f:facet>
+                                <p:commandLink action="#{plantillaDetalleController.eliminarPlantilla(p)}" update="fmplantillas">
+                                    <h:outputText value="eliminar"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                <h:form id="agregardet" style="padding-top: 50px;" >
+                    <h:panelGrid columns="2" cellspacing="10">
+                    <h:outputText value="Plantilla seleccionada"/>
+                    <h:inputText value="#{plantillaDetalleController.plantilla.nombreplantilla}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3" cellspacing="10">
+                    <h:outputText value="Seleccionar Concepto"/>
+                    <p:selectOneMenu id="descp" value="#{plantillaDetalleController.producto.id}" style="width: 400px" required="true" immediate="true" autoWidth="false" requiredMessage="SELECCIONE CONCEPTO" >
+                            <f:selectItem itemLabel="Seleccione Servicio" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{plantillaDetalleController.productos}" var="prod" itemLabel="#{prod.concepto}" itemValue="#{prod.id}" />
+                            <p:ajax event="change" update="@this"></p:ajax>
+                     </p:selectOneMenu>
+                    <p:commandLink value="sino existe concepto AGREGAR CONCEPTO" oncomplete="PF('dlg4').show()" immediate="true" />         
+                    </h:panelGrid>
+                    <h:panelGrid>
+                        <p:commandButton value="AGREGAR" action="#{plantillaDetalleController.agregarConcepto()}" update="fmdetplantilla" />
+                    </h:panelGrid>
+                </h:form>
+             
+                <h:form id="fmdetplantilla" style="padding-top: 50px;" >
+                    <p:dataTable id="detalle" style="width: 400px;" var="d" value="#{plantillaDetalleController.plantillasdetalle}" >
+                           <p:column width="100" headerText="NOMBRE PLANTILLA" >
+                                <f:facet name="nombre">
+                                    <h:outputText value="NOMBRE PLANTILLA"/>
+                                </f:facet>
+                               <h:outputText id="npid" value="#{plantillaDetalleController.productoEJB.find(d.idconcepto).getConcepto()}"/>
+                            </p:column>
+                            <p:column width="100" headerText="ELIMINAR">
+                                <f:facet name="eliminar">
+                                    <h:outputText value="eliminar"/>
+                                </f:facet>
+                                <p:commandLink action="#{plantillaDetalleController.eliminarDetalle(d)}" update=":fmdetplantilla:detalle" >
+                                    <h:outputText value="eliminar"/>
+                                </p:commandLink>
+                            </p:column>
+                    </p:dataTable>
+                     <h:outputText value="#{d.idconcepto}"/>
+                </h:form>
+                
+                <p:dialog header="Agregar Nuevo Concepto" id="agregarconcep" widgetVar="dlg4" height="100" width="550" positionType="absolute" position="top" dynamic="true" >
+                    <h:form id="form2">
+                        <h:panelGrid columns="4" cellpadding="3">
+                            <h:outputText value="Nombre Servicio:"/>
+                            <h:inputText id="concepto" value="#{plantillaDetalleController.producto.concepto}" size="50" maxlength="65"></h:inputText>
+                            <f:facet name="footer">
+                                <p:commandButton value="ACEPTAR" id="cambiar" icon="ui-icon-disk" action="#{plantillaDetalleController.guardarServicio()}"
+                                             update=":agregardet:descp" oncomplete="PF('dlg4').hide()" >
+                                </p:commandButton>
+                            <p:spacer></p:spacer>
+                            <p:commandButton value="CANCELAR" id="cancel" onclick="dlg4.hide();" />   
+                            </f:facet>
+                        </h:panelGrid>
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+
+            <ui:define name="bottom">
+                bottom
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

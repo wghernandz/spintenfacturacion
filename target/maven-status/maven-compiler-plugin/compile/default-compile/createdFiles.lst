@@ -1,8 +1,10 @@
 com\spintenfacturacion\model\Municipio_.class
 com\spintenfacturacion\model\Persona_.class
 com\spintenfacturacion\ejb\ProductoFacade.class
+com\spintenfacturacion\model\plantillaDetalle.class
 com\spintenfacturacion\ejb\marcaVehiculoFacadeLocal.class
 com\spintenfacturacion\controller\plantillabaseController.class
+com\spintenfacturacion\ejb\PlantillaFacade.class
 com\spintenfacturacion\ejb\MunicipioFacade.class
 com\spintenfacturacion\ejb\DepartamentoFacade.class
 com\spintenfacturacion\model\vehiculoModelo.class
@@ -14,6 +16,7 @@ com\spintenfacturacion\model\Factura_.class
 com\spintenfacturacion\ejb\vehiculoModeloFacade.class
 com\spintenfacturacion\ejb\UsuarioFacadeLocal.class
 com\spintenfacturacion\model\Usuario.class
+com\spintenfacturacion\model\Plantilla_.class
 com\spintenfacturacion\utileria\NumeroLetras.class
 com\spintenfacturacion\model\Factura.class
 com\spintenfacturacion\ejb\UsuarioFacade.class
@@ -24,8 +27,10 @@ com\spintenfacturacion\controller\vehiculoController.class
 com\spintenfacturacion\model\usuarioRole_.class
 com\spintenfacturacion\ejb\tipoDocumentoFacadeLocal.class
 com\spintenfacturacion\model\marcaVehiculo_.class
+com\spintenfacturacion\ejb\plantillaDetalleFacade.class
 com\spintenfacturacion\model\Departamento.class
 com\spintenfacturacion\ejb\PersonaFacadeLocal.class
+com\spintenfacturacion\controller\plantillaDetalleController.class
 com\spintenfacturacion\model\marcaVehiculo.class
 com\spintenfacturacion\model\Usuario_.class
 com\spintenfacturacion\model\tipoDocumento.class
@@ -38,6 +43,7 @@ com\spintenfacturacion\ejb\detalleFacturaFacadeLocal.class
 com\spintenfacturacion\ejb\correlativoDocFacade.class
 com\spintenfacturacion\ejb\ProductoFacadeLocal.class
 com\spintenfacturacion\controller\indexController.class
+com\spintenfacturacion\model\Plantilla.class
 com\spintenfacturacion\model\Cliente_.class
 com\spintenfacturacion\model\correlativoDoc.class
 com\spintenfacturacion\ejb\vehiculoModeloFacadeLocal.class
@@ -49,11 +55,13 @@ com\spintenfacturacion\utileria\metodosCadena.class
 com\spintenfacturacion\ejb\PersonaFacade.class
 com\spintenfacturacion\ejb\RoleFacade.class
 com\spintenfacturacion\ejb\correlativoDocFacadeLocal.class
+com\spintenfacturacion\ejb\PlantillaFacadeLocal.class
 com\spintenfacturacion\model\Producto.class
 com\spintenfacturacion\model\detalleFactura.class
 com\spintenfacturacion\model\Cliente.class
 com\spintenfacturacion\ejb\usuarioRoleFacade.class
 com\spintenfacturacion\controller\opfacturaController.class
+com\spintenfacturacion\model\plantillaDetalle_.class
 com\spintenfacturacion\ejb\marcaVehiculoFacade.class
 com\spintenfacturacion\ejb\RoleFacadeLocal.class
 com\spintenfacturacion\controller\detalleController.class
@@ -68,4 +76,5 @@ com\spintenfacturacion\ejb\AbstractFacade.class
 com\spintenfacturacion\ejb\DepartamentoFacadeLocal.class
 com\spintenfacturacion\model\Role.class
 com\spintenfacturacion\model\Persona.class
+com\spintenfacturacion\ejb\plantillaDetalleFacadeLocal.class
 com\spintenfacturacion\controller\correlativoController.class

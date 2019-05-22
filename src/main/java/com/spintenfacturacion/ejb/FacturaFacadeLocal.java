@@ -37,7 +37,7 @@ public interface FacturaFacadeLocal {
     
     List<detalleFactura> imprimirDetalle(int idfactura);
     
-    Factura facturaEnproceso();
+    Factura facturaEnproceso(String username);
     
     List<Factura> facturaRangofecha(Date finicial,Date ffinal);
     
@@ -45,5 +45,8 @@ public interface FacturaFacadeLocal {
     
     Factura facturaConncnd(int idfact);
     
-    boolean existeCorr(correlativoDoc corr,int corrabuscar);    
+    boolean existeCorr(correlativoDoc corr,int corrabuscar);
+
+    List<Factura> facturaRangofechaASC(Date finicial,Date ffinal);
+  
 }

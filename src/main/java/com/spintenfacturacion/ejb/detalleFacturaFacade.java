@@ -5,7 +5,6 @@
  */
 package com.spintenfacturacion.ejb;
 
-import com.spintenfacturacion.model.correlativoDoc;
 import com.spintenfacturacion.model.detalleFactura;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -38,22 +37,23 @@ public class detalleFacturaFacade extends AbstractFacade<detalleFactura> impleme
       List<detalleFactura> lista=null;
       String consulta;
       try{
-        consulta="SELECT d FROM detalleFactura d WHERE d.factura.id = ?1 ";
+        consulta="SELECT d FROM detalleFactura d WHERE d.factura.id = ?1 ORDER BY d.id ASC ";
         Query query=em.createQuery(consulta);
         query.setParameter(1, idfactura);  
         lista = (List<detalleFactura>)query.getResultList();
-    
-      if(lista.size()>2){
-            System.out.println("producto Origen0"+lista.get(0).getProducto().getId());
-            System.out.println("producto Origen1"+lista.get(1).getProducto().getConcepto());
-            System.out.println("producto preciounitario0 "+lista.get(0).getPreciounitario());
-            System.out.println("producto preciounitario1 "+lista.get(1).getPreciounitario());
-            }
         
+        for(int indice = 0;indice<lista.size();indice++)
+        {
+            System.out.println("VALOR "+indice+" "+lista.get(indice).getProducto().getConcepto());
+            System.out.println("VALOR ID DE PRODUCTO "+indice+" "+lista.get(indice).getProducto().getId());
+        }
+
+        return lista;
       }catch (Exception e){
-       System.out.println(e.getMessage());
+        System.out.println(e.getMessage());
+        return null ;
       }
-      return lista;
+     
     }
     
 }

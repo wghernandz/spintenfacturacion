@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import static java.lang.System.out;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +92,7 @@ public class rptfacturacionController implements Serializable {
     
      public void generarPorFecha(ActionEvent actionEvent,Date fechainicial,Date fechafinal,String tiporeporte) throws JRException, IOException{
         File jasper=null;
-        facturas=facturaEJB.facturaRangofecha(fechainicial, fechafinal);
+        facturas=facturaEJB.facturaRangofechaASC(fechainicial, fechafinal);
         if ("pdf".equals(tiporeporte)){
             
                 jasper= new File(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/reportes/ventasxfecha.jasper"));
@@ -108,11 +111,11 @@ public class rptfacturacionController implements Serializable {
             FacesContext.getCurrentInstance().responseComplete();
         }
         else{//excel
-                    
+                    Format formater= new SimpleDateFormat("dd-MM-yyyy");
                     jasper= new File(FacesContext.getCurrentInstance().getExternalContext().getRealPath("/reportes/ventasxfecha.jasper"));
                     JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(),new HashMap(),new JRBeanCollectionDataSource(facturas,false));
                     HttpServletResponse httpServletResponse=(HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse(); 
-                    httpServletResponse.addHeader("Content-disposition", "attachment; filename=report.xlsx"); 
+                    httpServletResponse.addHeader("Content-disposition", "attachment; filename=paraCXC"+formater.format(new Date())+".xlsx"); 
                     ServletOutputStream servletOutputStream=httpServletResponse.getOutputStream(); 
                     JRXlsxExporter docxExporter=new JRXlsxExporter();
                     docxExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -126,8 +129,7 @@ public class rptfacturacionController implements Serializable {
                     configuration.setWhitePageBackground(false);
                     docxExporter.setConfiguration(configuration);
                     docxExporter.exportReport(); 
-                    FacesContext.getCurrentInstance().responseComplete(); 
-                 
+                    FacesContext.getCurrentInstance().responseComplete();           
         }
         
      }

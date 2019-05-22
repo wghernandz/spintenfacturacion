@@ -86,25 +86,41 @@ public class correlativoController implements Serializable{
         int corrini=metodosCadena.obtenerSoloCorrelativo(this.correlativodoc.getSerieautini());
         int corrfin=metodosCadena.obtenerSoloCorrelativo(this.correlativodoc.getSerieautfin());
         
-        if (corrini==0 & corrfin==0){
-                 FacesContext.getCurrentInstance().addMessage(
-                null, new FacesMessage("VERIFIQUE SERIE AUTORIZADA"));
+     
+        int iniciaren=this.correlativodoc.getIniciaren();
+        
+        if(this.getCorrelativodoc().getIniciaren()!=0 && (iniciaren>corrini&&iniciaren<=corrfin)){
+        
+            if (corrini==0 & corrfin==0){
+                     FacesContext.getCurrentInstance().addMessage(
+                    null, new FacesMessage("VERIFIQUE SERIE AUTORIZADA"));
  
-        FacesContext.getCurrentInstance()
-            .getExternalContext()
-            .getFlash().setKeepMessages(true);
+            FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getFlash().setKeepMessages(true);
         
-            UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
-            return view.getViewId() + "?faces-redirect=true&includeViewParams=true"; 
+                UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
+                return view.getViewId() + "?faces-redirect=true&includeViewParams=true"; 
     
-        }else{
-            correlativodoc.setCinicial(corrini);
-            correlativodoc.setCfinal(corrfin);
+            }else{
+                correlativodoc.setCinicial(corrini);
+                correlativodoc.setCfinal(corrfin);
         
-            correlativodocEJB.create(this.correlativodoc);
+                correlativodocEJB.create(this.correlativodoc);
         
-            FacesContext.getCurrentInstance().addMessage(
-            null, new FacesMessage("CORRELATIVO INGRESADO CON EXITO"));
+                FacesContext.getCurrentInstance().addMessage(
+                null, new FacesMessage("CORRELATIVO INGRESADO CON EXITO"));
+ 
+                FacesContext.getCurrentInstance()
+                    .getExternalContext()
+                    .getFlash().setKeepMessages(true);
+        
+                    UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
+                    return view.getViewId() + "?faces-redirect=true&includeViewParams=true";
+            }
+    }else{
+             FacesContext.getCurrentInstance().addMessage(
+            null, new FacesMessage("VERIFICAR CORRELATIVO A INICIAR"));
  
             FacesContext.getCurrentInstance()
                 .getExternalContext()
@@ -112,16 +128,21 @@ public class correlativoController implements Serializable{
         
                 UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
                 return view.getViewId() + "?faces-redirect=true&includeViewParams=true";
-        }
+        }    
+    
     }
     
     public String modificarCorrelativo(){
         int corrini=metodosCadena.obtenerSoloCorrelativo(this.correlativodoc.getSerieautini());
         int corrfin=metodosCadena.obtenerSoloCorrelativo(this.correlativodoc.getSerieautfin());
+        
+        int iniciaren=this.correlativodoc.getIniciaren();
+        System.out.println("valor iniciar en "+iniciaren);
+        if(this.getCorrelativodoc().getIniciaren()!=0 && (iniciaren<this.getCorrelativodoc().getCinicial()&&iniciaren>=this.getCorrelativodoc().getCfinal())){
+        
         correlativodoc.setCinicial(corrini);
         correlativodoc.setCfinal(corrfin);
         correlativodoc.setTipodocumento(tipodocumento);
-        correlativodoc.setEstado("en uso");
         
          correlativodocEJB.edit(correlativodoc);
          
@@ -133,15 +154,29 @@ public class correlativoController implements Serializable{
             .getFlash().setKeepMessages(true);
         
             UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
-            return view.getViewId() + "?faces-redirect=true&includeViewParams=true";   
+            return view.getViewId() + "?faces-redirect=true&includeViewParams=true";
+        }else{
+               FacesContext.getCurrentInstance().addMessage(
+            null, new FacesMessage("VERIFICAR CORRELATIVO A INICIAR"));
+ 
+            FacesContext.getCurrentInstance()
+                .getExternalContext()
+                .getFlash().setKeepMessages(true);
+        
+                UIViewRoot view = FacesContext.getCurrentInstance().getViewRoot();
+                return view.getViewId() + "?faces-redirect=true&includeViewParams=true";
+        }
     }
     
     public String eliminarCorrelativo(){
         this.correlativodoc=correlativodocEJB.find(correlativodoc.getId());
         
-        if (this.correlativodoc.getEstado().equals("en uso")==true){
+        System.out.println("facturas asociadas "+correlativodocEJB.corrFactura(this.correlativodoc.getId()));
+        if (correlativodocEJB.corrFactura(this.correlativodoc.getId())>0){
+            
+             this.correlativodoc=new correlativoDoc();
              FacesContext.getCurrentInstance().addMessage(
-             null, new FacesMessage("CORRELATIVO EN USO NO SE PUEDE ELIMINAR!!!"));
+             null, new FacesMessage("CORRELATIVO TIENE FACTURAS NO SE PUEDE ELIMINAR!!!"));
  
             FacesContext.getCurrentInstance()
             .getExternalContext()

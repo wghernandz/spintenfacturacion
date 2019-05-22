@@ -109,5 +109,24 @@ public class correlativoDocFacade extends AbstractFacade<correlativoDoc> impleme
       }
       return correlativo;
         //return resultado;
-    } 
+    }
+    
+       //VERIFICAR SI UN CORRELATIVO TIENE FACTURAS ASOCIADAS
+    @Override
+    public long corrFactura(int idcorr){
+       long cantidad=0;
+       
+       try{
+        String consulta;
+        consulta=" SELECT count(f) FROM Factura f where f.correlativodoc.id = ?1";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,idcorr);
+        
+        cantidad = (long)query.getSingleResult();
+        
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+       return cantidad;
+    }
 }

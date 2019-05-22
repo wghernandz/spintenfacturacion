@@ -36,4 +36,5 @@ public interface correlativoDocFacadeLocal {
 
     public correlativoDoc actEstadoCorr(int idcorr);
     
+    public long corrFactura(int idcorr);
 }

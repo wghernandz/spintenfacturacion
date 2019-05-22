@@ -86,23 +86,21 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
         consulta="SELECT d  FROM detalleFactura d WHERE d.factura.id = ?1 ";
         Query query=em.createQuery(consulta);
         query.setParameter(1,id);
-        
         lista = query.getResultList();
-        System.out.println("Valor de LISTA "+lista.get(0).getId());
       }catch (Exception e){
        System.out.println(e.getMessage());
       }
       return lista;
-    } 
+    }   
     
     //PARA IMPRIMIR FACTURA
     @Override
-    public Factura facturaEnproceso(){
+    public Factura facturaEnproceso(String username){
       Factura factura = null;
       List<Factura> lista=null;
       try{
         String consulta;
-        consulta="SELECT f  FROM Factura f WHERE f.estado = 'En proceso' ";
+        consulta="SELECT f  FROM Factura f WHERE f.estado = 'En proceso' and f.usuario.username='"+username+"'";
         Query query=em.createQuery(consulta);
         
         lista = query.getResultList();
@@ -120,7 +118,7 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       List<Factura> lista = null;
       try{
         String consulta;
-        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.correlativo,f.fecha,f.correlativodoc.tipodocumento.id ASC";
+        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.fecha DESC,f.correlativodoc.id DESC,f.correlativo DESC";
         Query query=em.createQuery(consulta);
         query.setParameter(1,fini,TemporalType.DATE);
         query.setParameter(2,ffin,TemporalType.DATE);
@@ -130,7 +128,25 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
        System.out.println(e.getMessage());
       }
       return lista;
-    } 
+    }
+    
+        //obtener listado de facturas segun rango de fechas.
+    @Override
+    public List<Factura> facturaRangofechaASC(Date fini,Date ffin){
+      List<Factura> lista = null;
+      try{
+        String consulta;
+        consulta="SELECT f FROM Factura f WHERE f.fecha >= ?1 AND f.fecha <= ?2 ORDER BY f.fecha ASC,f.correlativodoc.id ASC,f.correlativo ASC";
+        Query query=em.createQuery(consulta);
+        query.setParameter(1,fini,TemporalType.DATE);
+        query.setParameter(2,ffin,TemporalType.DATE);
+        
+        lista = query.getResultList();
+      }catch (Exception e){
+       System.out.println(e.getMessage());
+      }
+      return lista;
+    }
     
     /*select * from factura f,correlativodoc corr,tipodocumento t 
         where f.idcorrelativo=corr.id and corr.iddoc=t.id and (t.codigo='CCF' or t.codigo='FCF') and t.IDSUCURSAL=2*/
@@ -162,7 +178,7 @@ public class FacturaFacade extends AbstractFacade<Factura> implements FacturaFac
       List<Factura> lista=null;
       try{
         String consulta;
-        consulta="SELECT f FROM Factura f WHERE f.idccfajustado = ?1  ";
+        consulta="SELECT f FROM Factura f WHERE f.ncnd.id = ?1  ";
         Query query=em.createQuery(consulta);
         query.setParameter(1, idfact);
         

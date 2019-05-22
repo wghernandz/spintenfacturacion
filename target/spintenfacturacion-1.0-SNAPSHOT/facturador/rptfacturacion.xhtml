@@ -19,9 +19,9 @@
             <h:form>
             <h:panelGrid columns="4" cellpadding="10">
                 <h:outputText value="Fecha Inicial"></h:outputText>
-                <p:calendar value="#{fechainicial}" />
+                <p:calendar value="#{fechainicial}" autocomplete="off" />
                 <h:outputText value="Fecha Final"></h:outputText>
-                <p:calendar value="#{fechafinal}" />
+                <p:calendar value="#{fechafinal}" autocomplete="off" />
                 <p:commandLink id="obtener" value="GENERAR" 
                  action="#{rptfacturacionController.generarPorFecha(ActionEvent,fechainicial,fechafinal,'excel')}" ajax="false" />
             </h:panelGrid>

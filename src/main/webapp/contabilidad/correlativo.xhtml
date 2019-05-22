@@ -18,7 +18,7 @@
                             <f:selectItems value="#{correlativoController.tiposdoc}" var="doc" itemLabel="#{doc.nombredoc}" itemValue="#{doc.id}"  />
                         </p:selectOneMenu>
                     </h:panelGrid>
-                <h:panelGrid columns="8">
+                <h:panelGrid columns="6">
                     <h:outputText value="Numero de Resolucion" />
                     <p:inputText id="numresolucion" value="#{correlativoController.correlativodoc.nresolucion}"/>
                     <h:outputText value="Fecha de Autorizacion" />
@@ -26,7 +26,11 @@
                     <h:outputText value="Serie Autorizada del"/>
                     <p:inputText id="fechautinic" value="#{correlativoController.correlativodoc.serieautini}"/>
                     <h:outputText value="Serie Autorizada al" />
-                    <p:inputText id="fechautfin" value="#{correlativoController.correlativodoc.serieautfin}" />
+                    <p:inputText id="fechautfi" value="#{correlativoController.correlativodoc.serieautfin}"/>
+                    <h:outputText value="Iniciar en" />
+                    <p:inputMask id="iniciaren" value="#{correlativoController.correlativodoc.iniciaren}" required="true" mask="9999" maxlength="4"  >
+                     <f:convertNumber type="number" pattern="0000" />
+                    </p:inputMask>
                     <p:commandButton value="AGREGAR" action="#{correlativoController.guardarCorrelativo()}"/>
                     <p:commandButton value="MODIFICAR" action="#{correlativoController.modificarCorrelativo()}" />
                     <p:commandButton value="ELIMINAR" action="#{correlativoController.eliminarCorrelativo()}"/>
@@ -38,19 +42,19 @@
                                 Correlativos
                             </f:facet>
                  
-                            <p:column headerText="TIPO DOC" width="300">
+                            <p:column headerText="TIPO DOC" width="280">
                                 <h:outputText value="#{corr.tipodocumento.nombredoc}"></h:outputText>                        
                             </p:column>
-                            <p:column headerText="NUM RESOLUCION" width="200">
+                            <p:column headerText="NUM RESOLUCION" width="180">
                                 <h:outputText value="#{corr.nresolucion}"></h:outputText>                        
                             </p:column>
                             <p:column headerText="FECHA AUTORIZACION" width="100">
                                 <h:outputText value="#{corr.fautorizacion}"><f:convertDateTime type="date" pattern="dd-MM-yyyy"/></h:outputText>
                             </p:column>
-                            <p:column headerText="DEL" width="130">
+                            <p:column headerText="DEL" width="105">
                                 <h:outputText value="#{corr.serieautini}" />                           
                             </p:column>
-                            <p:column headerText="AL" width="130">
+                            <p:column headerText="AL" width="105">
                                 <h:outputText value="#{corr.serieautfin}"></h:outputText>
                             </p:column>
                             <p:column headerText="CORR INICIO" width="50">
@@ -58,6 +62,9 @@
                             </p:column>
                             <p:column headerText="CORR FIN" width="40">
                                 <h:outputText value="#{corr.cfinal}"></h:outputText>
+                            </p:column>
+                            <p:column headerText="INICIAR EN" width="40">
+                                <h:outputText value="#{corr.iniciaren}"></h:outputText>
                             </p:column>
                             <p:column headerText="ESTADO" width="50">
                                 <h:outputText value="#{corr.estado}"></h:outputText>     

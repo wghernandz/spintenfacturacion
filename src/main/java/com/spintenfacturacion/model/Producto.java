@@ -7,13 +7,11 @@ package com.spintenfacturacion.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -27,9 +25,7 @@ public class Producto implements Serializable {
     private int id;
     @Column(name="concepto")
     private String concepto;
-    //@OneToMany(mappedBy="producto")
-    //private Set<detalleFactura> detallefacturalist;
-
+  
     public int getId() {
         return id;
     }
@@ -46,15 +42,7 @@ public class Producto implements Serializable {
         this.concepto = concepto;
     }
 
-   /* public Set<detalleFactura> getDetallefacturalist() {
-        return detallefacturalist;
-    }
-
-    public void setDetallefacturalist(Set<detalleFactura> detallefacturalist) {
-        this.detallefacturalist = detallefacturalist;
-    }*/
-
-    @Override
+   @Override
     public int hashCode() {
         int hash = 3;
         hash = 79 * hash + this.id;
@@ -81,3 +69,4 @@ public class Producto implements Serializable {
         return true;
     } 
 }
+

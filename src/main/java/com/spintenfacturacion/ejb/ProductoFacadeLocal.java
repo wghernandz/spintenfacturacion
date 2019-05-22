@@ -30,4 +30,6 @@ public interface ProductoFacadeLocal {
 
     int count();
     
+    String obtConceptoProd(int idproducto);
+    
 }
