@@ -47,7 +47,7 @@
                                 <p:column><h:outputText value="Direccion"/></p:column>
                                 <p:column colspan="3"><p:inputText id="direccion" value="#{clienteController.persona.direccion}" style="width: 500px" /></p:column>
                                 <p:column><h:outputText value="Departamento*"  /></p:column>
-                                 <p:column><p:selectOneMenu id="departamento" value="#{clienteController.departamento.id}" required="true">
+                                 <p:column><p:selectOneMenu id="departamento" value="#{clienteController.departamento.id}" required="true" >
                                     <f:selectItem itemLabel="Seleccione Depto" itemValue="" noSelectionOption="true"/>
                                     <f:selectItems value="#{clienteController.departamentos}" var="depto" itemLabel="#{depto.nombredepto}" itemValue="#{depto.id}"/>
                                     <f:ajax listener="#{clienteController.municipioXdepartamento()}" render="municipio"/>
@@ -56,6 +56,7 @@
                                 <p:column><p:selectOneMenu id="municipio" value="#{clienteController.municipio.id}" required="true" autoWidth="false">
                                     <f:selectItem itemLabel="Seleccione Municipio" itemValue="" noSelectionOption="true"/>
                                     <f:selectItems value="#{clienteController.municipios}" var="muni" itemLabel="#{muni.nombremunicipio}" itemValue="#{muni.id}"/>
+                                    <p:ajax event="change" update="@this" />
                                 </p:selectOneMenu></p:column>
                             </p:row>
                             <p:row>
@@ -74,7 +75,7 @@
                                 <p:column><h:outputText value="NRC*" /></p:column>
                                 <p:column><p:inputText id="nrc" value="#{clienteController.cliente.nrc}" required="true"/></p:column>
                                 <p:column><h:outputText value="Giro"/></p:column>
-                                <p:column><p:inputText id="giro" value="#{clienteController.cliente.giro}" maxlength="27"/></p:column>
+                                <p:column><p:inputText id="giro" value="#{clienteController.cliente.giro}" maxlength="48"/></p:column>
                             </p:row>
                             <p:row>
                                 <p:column><h:outputText value="Dias Credito*"/></p:column>
@@ -122,7 +123,7 @@
                                    <h:outputText value="#{client.rangocontribuy}" />
                                </p:column>
                             <f:facet name="footer">
-                                <p:commandButton action="#{clienteController.establecerClientePersona()}" update=":mttcliente" icon="ui-icon-search" value="Seleccionar"  oncomplete="PF('dlgbuscar').hide()" />
+                                <p:commandButton action="#{clienteController.establecerClientePersona()}" update="mttcliente" icon="ui-icon-search" value="Seleccionar"  oncomplete="PF('dlgbuscar').hide()" />
                             </f:facet>
                         </p:dataTable>
                     </h:form>

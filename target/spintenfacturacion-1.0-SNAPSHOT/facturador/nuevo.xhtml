@@ -148,9 +148,9 @@
                         </p:selectOneRadio>        
                         <h:outputText value="Cantidad"/>
                         <p:inputNumber id="cant" value="#{nuevaFacturaController.detallefactura.cantidad}" minValue="0" decimalPlaces="2" required="true" disabled="#{nuevaFacturaController.guardarcambios}"/>
-                        <p:commandButton id="miconcepto" type="button" icon="fa fa-search" value="BUSCAR CONCEPTO" onclick="PF('dlgconcepto').show();" immediate="true" update="bconcepto" />
+                        <p:commandButton id="miconcepto" type="button" icon="fa fa-search" value="BUSCAR CONCEPTO" onclick="PF('dlgconcepto').show();" immediate="true" update="bconcepto" disabled="#{nuevaFacturaController.guardarcambios}"/>
                         <p:inputText id="detail" value="#{nuevaFacturaController.producto.concepto}" readonly="true" />
-                        <h:inputHidden id="detailoculto" value="#{nuevaFacturaController.producto.concepto}" required="true" requiredMessage="SELECCIONE CONCEPTO DE DETALE!"/>
+                        <h:inputHidden id="detailoculto" value="#{nuevaFacturaController.producto.concepto}" required="true" requiredMessage="SELECCIONE CONCEPTO DE DETALE!" rendered="#{nuevaFacturaController.guardarcambios==false}" />
                         <!--<p:commandLink value="AGREGAR CONCEPTO" oncomplete="PF('dlg4').show()" immediate="true" actionListener="{nuevaFacturaController.crearNuevo}" />-->                   
                         </h:panelGrid>
                             <h:panelGrid id="fact1" columns="10"  style="margin-bottom:10px" cellpadding="2">

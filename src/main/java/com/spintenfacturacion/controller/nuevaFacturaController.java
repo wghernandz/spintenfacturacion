@@ -792,61 +792,63 @@ public class nuevaFacturaController implements Serializable {
             this.departamento=departamentoEJB.find(this.cliente.getPersona().getMunicipio().getDepartamento().getId());
         }
         
+    public void actualizarIvaRetSubtotal(){
+        this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
+         if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+              this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2, RoundingMode.HALF_UP));
+             }else{
+             this.factura.setRetencion(new BigDecimal("0.00"));
+             }
+             this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_UP));
+        }
+        
         public void operacionesAgregarModificar(){
             String tipodoc=factura.getCorrelativodoc().getTipodocumento().getCodigo();
             //guardar detalles, tipo venta 0 si es gravada, 1 si es exento, 2 otro caso
             if(this.tipoventa==0){ 
                 //Verificar si es factura consumidor final, si es asi, modificar calculos  
                 if(!"FCF".equals(tipodoc)){
-                    //cuando no es factura consumidor final el acumuladorVentagra posee valor neto
-                    this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//establecer valores netos
-                    //this.acumulatorVentagra=this.acumulatorVentagra.add(this.detallefactura.getVneto());//acumular suma valor neto y mostrar
-                    this.factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto()));
-                    this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
-                        //verificar tipo de contribuyente para efectuar retencion
-                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
-                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2, RoundingMode.HALF_UP));
-                        }else{
-                            this.factura.setRetencion(new BigDecimal("0.00"));
-                        }
-                    this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_UP));
+                        //cuando no es factura consumidor final el acumuladorVentagra posee valor neto
+                        this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//establecer valores netos
+                        this.factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto()));
+                        actualizarIvaRetSubtotal();
                     }else{
-                        //cuando es factura consumidor final el acumuladorVentagra tiene un valor total, se debe obtener el valor neto para guardarlo
-                        this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//es vtotal
-                        //this.acumulatorVentagra=this.acumulatorVentagra.add(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP));//acumular suma valor neto y mostrar
-                        factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP)));
+                            //cuando es factura consumidor final el acumuladorVentagra tiene un valor total, se debe obtener el valor neto para guardarlo
+                            this.detallefactura.setVneto(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));//es vtotal
+                            factura.setAcumventagra(factura.getAcumventagra().add(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),4,RoundingMode.HALF_UP)));
+                            this.vafectafactura=factura.getAcumventagra().multiply(new BigDecimal("1.13"));//solo para efecto de mostrar
                         
-                        this.vafectafactura=factura.getAcumventagra().multiply(new BigDecimal("1.13"));//solo para efecto de mostrar
-                        
-                        this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
-                             //verificar tipo de contribuyente para efectuar retencion
-                        if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
-                            this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2,RoundingMode.HALF_UP));
-                        }else{
-                            this.factura.setRetencion(new BigDecimal("0.00"));
+                            this.setIva(factura.getAcumventagra().multiply(new BigDecimal("0.13")).setScale(2, RoundingMode.HALF_UP));
+                            //verificar tipo de contribuyente para efectuar retencion
+                            if("Gran Contribuyente".equals(this.cliente.getRangocontribuy()) &&  (factura.getAcumventagra().compareTo(new BigDecimal("100"))==0 || factura.getAcumventagra().compareTo(new BigDecimal("100"))==1)){
+                                this.factura.setRetencion(factura.getAcumventagra().multiply(new BigDecimal("0.01")).setScale(2,RoundingMode.HALF_UP));//ESTABA HALF_UP
+                            }else{
+                                this.factura.setRetencion(new BigDecimal("0.00"));
+                            }
+                            //Establecer subtotal de acuerdo si es factura servipinten o serviradiadores
+                            if(factura.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){//serviradiadores
+                                this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).subtract(this.factura.getRetencion()));
+                            }else{//servipinten
+                                this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).add(factura.getAcumventaex()));
+                            }
                         }
-                        //Establecer subtotal de acuerdo si es factura servipinten o serviradiadores
-                        if(factura.getCorrelativodoc().getTipodocumento().getIdsucursal()==1){//serviradiadores
-                            this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).subtract(this.factura.getRetencion()));
-                        }else{//servipinten
-                            this.setSubtotal(factura.getAcumventagra().multiply(new BigDecimal("1.13")).setScale(2, RoundingMode.HALF_DOWN).add(factura.getAcumventaex()));
-                        }
-                     }
-                this.detallefactura.setVexento(new BigDecimal(0));
-                this.detallefactura.setVnogravado(new BigDecimal(0));
-            }else if(this.tipoventa==1){
-                            this.detallefactura.setVexento(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));
-                            //this.acumulatorVentaex=this.acumulatorVentaex.add(this.detallefactura.getVexento());
-                            factura.setAcumventaex(factura.getAcumventaex().add(this.detallefactura.getVexento()));
-                            this.detallefactura.setVneto(new BigDecimal(0));
-                            this.detallefactura.setVnogravado(new BigDecimal(0));
-                        }else{
-                            this.detallefactura.setVnogravado(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));
-                            //this.acumulatorVentans=this.acumulatorVentans.add(this.detallefactura.getVnogravado());
-                            factura.setAcumventans(factura.getAcumventans().add(this.detallefactura.getVnogravado()));
-                            this.detallefactura.setVneto(new BigDecimal(0));
                             this.detallefactura.setVexento(new BigDecimal(0));
-                          }       
+                            this.detallefactura.setVnogravado(new BigDecimal(0));
+                        }else if(this.tipoventa==1){
+                                this.detallefactura.setVexento(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));
+                                factura.setAcumventaex(factura.getAcumventaex().add(this.detallefactura.getVexento()));
+                                this.detallefactura.setVneto(new BigDecimal(0));
+                                this.detallefactura.setVnogravado(new BigDecimal(0));
+                                //agregue
+                                actualizarIvaRetSubtotal();
+                                }else{
+                                    this.detallefactura.setVnogravado(this.detallefactura.getCantidad().multiply(this.detallefactura.getPreciounitario()));
+                                    factura.setAcumventans(factura.getAcumventans().add(this.detallefactura.getVnogravado()));
+                                    this.detallefactura.setVneto(new BigDecimal(0));
+                                    this.detallefactura.setVexento(new BigDecimal(0));
+                                    //agregue
+                                    actualizarIvaRetSubtotal();
+                                }       
             //validar si el subtotal y retencion no sean igual a null
             if(this.subtotal==null){this.subtotal=new BigDecimal(0);}
             if(this.factura.getRetencion()==null){this.factura.setRetencion(new BigDecimal(0));}
@@ -863,7 +865,6 @@ public class nuevaFacturaController implements Serializable {
                 }
             //Pasar sumatoria total a letras
             this.factura.setTventaenletras(NumeroLetras.cantidadConLetra(this.factura.getTotalventa().toString()));
-            //this.factura.setTotalventa(this.acumulatorVentagra.add(this.iva));
         }
         //metodo para agregar factura y su respectivo detalle.
         public void agregarDetalle(){
@@ -1034,9 +1035,9 @@ public class nuevaFacturaController implements Serializable {
               if(!"FCF".equals(this.detallefactura.getFactura().getCorrelativodoc().getTipodocumento().getCodigo())){
                      //this.acumulatorVentagra=this.acumulatorVentagra.subtract(this.detallefactura.getVneto());
                      factura.setAcumventagra(factura.getAcumventagra().subtract(this.detallefactura.getVneto()));
-                     
                 }else{
-                     //this.acumulatorVentagra=this.acumulatorVentagra.subtract(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP));
+                     //AGREGUE PARA ACTUALIZAR subTOTAL VENTA--REVISAR
+                     this.setSubtotal(this.getSubtotal().subtract((this.detallefactura.getVneto())));
                      factura.setAcumventagra(factura.getAcumventagra().subtract(this.detallefactura.getVneto().divide(new BigDecimal("1.13"),2,RoundingMode.HALF_UP)));
                      this.vafectafactura=this.vafectafactura.subtract(this.detallefactura.getVneto());
                     }
@@ -1072,7 +1073,7 @@ public class nuevaFacturaController implements Serializable {
             this.agregar=true;
             this.imprimir=true;
             this.enmodificacion=true;
-        }
+        }   
      
         public void onRowDelete(ActionEvent event, detalleFactura detalle) {
             this.detallefactura=detalle;

@@ -249,8 +249,10 @@ public class clienteController implements Serializable {
     }
     
     public void establecerClientePersona(){
-        this.setDepartamento(this.cliente.getPersona().getMunicipio().getDepartamento());
-        this.setMunicipio(this.cliente.getPersona().getMunicipio());
+        this.departamento=this.cliente.getPersona().getMunicipio().getDepartamento();
+        this.municipio=this.cliente.getPersona().getMunicipio();
+        //this.setDepartamento(this.cliente.getPersona().getMunicipio().getDepartamento());
+        //this.setMunicipio(this.cliente.getPersona().getMunicipio());
         
         if(this.cliente.getPersona().getNombresociedad()==null)
         {
@@ -278,12 +280,17 @@ public class clienteController implements Serializable {
     
     public String modificarCliente(){
         
-    if (this.departamento.getId()==0){
+     if (this.departamento.getId()==0){
              this.municipio.setDepartamento(null);
              this.setMunicipio(null);
         }else{
             this.municipio.setDepartamento(departamento);  
         }
+        System.out.println("valor de departamento"+departamento.getNombredepto());
+        System.out.println("valor de municipio"+municipio.getNombremunicipio());
+        
+    
+        this.municipio.setDepartamento(departamento);
         this.persona.setMunicipio(municipio);
         this.cliente.setPersona(persona);
         personaEJB.edit(persona);
