@@ -33,11 +33,9 @@
         </p:submenu>
         <p:submenu label="CLIENTES" icon="ui-icon-folder-collapsed" rendered="#{plantillabaseController.obtenerRole()==2 or plantillabaseController.obtenerRole()==3 or plantillabaseController.obtenerRole()==4 or plantillabaseController.obtenerRole()==5}">
             <p:menuitem value="CLIENTE" url="/facturador/cliente.xhtml" icon="ui-icon-folder-open" />
-            <p:menuitem value="REPORTES CLIENTE" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
         </p:submenu>
         <p:submenu label="CORRELATIVOS" icon="ui-icon-folder-collapsed" rendered="#{plantillabaseController.obtenerRole()==2 or plantillabaseController.obtenerRole()==3}">
             <p:menuitem value="CORRELATIVO" url="/contabilidad/correlativo.xhtml" icon="ui-icon-folder-open" />
-            <p:menuitem value="REPORTES CORRELATIVO" url="/facturador/reportes.xhtml" icon="ui-icon-folder-open" />
         </p:submenu>
         <p:submenu label="VEHICULOS" icon="ui-icon-folder-collapsed" rendered="#{plantillabaseController.obtenerRole()==2 or plantillabaseController.obtenerRole()==3 or plantillabaseController.obtenerRole()==4 or plantillabaseController.obtenerRole()==5}">
             <p:menuitem value="AGREGAR VEHICULO" url="/facturador/vehiculo.xhtml" icon="ui-icon-folder-open" />
